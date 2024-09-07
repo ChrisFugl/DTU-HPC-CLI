@@ -10,6 +10,10 @@ python = "^3.10"
 typer = "^0.12.5"
 
 
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.6.4"
+ipykernel = "^6.29.5"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
@@ -17,3 +21,65 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 dtu-hpc = "dtu_hpc_cli:cli"
+
+
+[tool.ruff]
+exclude = [
+    # Exclude a variety of commonly ignored directories.
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".ruff_cache",
+    "dist",
+    # Directories/files we found to be missing from above list
+    ".devcontainer",
+    ".vscode",
+    "poetry.lock",
+]
+
+line-length = 120
+indent-width = 4
+target-version = "py311"
+
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+
+[tool.ruff.lint]
+select = [
+    "B",  # flake8-bugbear
+    "E",  # pycodestyle
+    "F",  # Pyflakes
+    "I",  # isort
+    "ISC"  # flake8-implicit-str-concat (used to disallow implicit string concatenation)
+]
+ignore = [
+    # The rule below may conflict with the formatter and is disabled for that reason.
+    "ISC001",
+    # we want to enforce explicit string concatenation,
+    # so we disable this rule that would otherwise enforce implicit concatenation
+    "ISC003",
+]
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+
+[tool.ruff.lint.isort]
+force-single-line = true
+known-first-party = ["evit_rust"]
+known-third-party = [
+    "prophesee_toolbox",
+    "wandb"
+]
+
+
+[tool.ruff.lint.flake8-implicit-str-concat]
+allow-multiline = false
