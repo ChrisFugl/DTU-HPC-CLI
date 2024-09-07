@@ -1,2 +1,3 @@
 *.pyc
 .dtu_hpc.json
+.vscode/
