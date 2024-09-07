@@ -20,8 +20,10 @@ class Client:
 
         self.shell = self.client.invoke_shell()
 
-        # We read the initial messages from HPC to know what the user prompt looks like.
-        self.init_messages = self.read().strip()
+        # Empty the initial messages from the HPC.
+        self.read()
+
+        self.num_prompt_lines = self.get_num_prompt_lines()
 
     def __enter__(self):
         return self
@@ -51,7 +53,7 @@ class Client:
         output: list[str] = []
         while True:
             if not self.shell.recv_ready():
-                # Hack: HPC will print several messages, but they will not occur at the same time.
+                # Hack: HPC will print several messages, but they might not occur at the same time.
                 # We wait for a short period to see if more messages are arriving.
                 time.sleep(wait)
                 if not self.shell.recv_ready():
@@ -62,11 +64,25 @@ class Client:
         output = "".join(output)
         return output
 
+    def get_num_prompt_lines(self) -> int:
+        """Count number of lines used for the user prompt.
+
+        We can get this by sending an echo command and counting the number of lines after the output.
+        """
+        msg = "foo"
+        command = f"echo {msg}"
+        self.shell.send(f"{command}\n")
+
+        output = self.read().strip()
+        lines = output.split("\r\n")
+        index = 0
+        for line in lines:
+            if msg in line and command not in line:
+                break
+            index += 1
+        return len(lines) - index - 1
+
     def remove_prompt(self, output: str) -> str:
         """The prompt is included in stdout, so we remove it."""
-        init_index = len(self.init_messages) - 1
-        output_end = len(output) - 1
-        while init_index >= 0 and output_end >= 0 and self.init_messages[init_index] == output[output_end]:
-            init_index -= 1
-            output_end -= 1
-        return output[: output_end + 1]
+        lines = output.split("\r\n")
+        return "\r\n".join(lines[: -self.num_prompt_lines])
