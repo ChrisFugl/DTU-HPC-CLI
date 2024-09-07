@@ -2,16 +2,20 @@ import dataclasses
 import json
 from pathlib import Path
 
+from dtu_hpc_cli.paths import get_project_root
+
 DEFAULT_HOSTNAME = "login1.hpc.dtu.dk"
 
 
 @dataclasses.dataclass
 class Config:
+    project_root: Path
     ssh: "SSH"
 
     @classmethod
     def load(cls):
-        path = Path.cwd() / ".dtu_hpc.json"
+        project_root = get_project_root()
+        path = project_root / ".dtu_hpc.json"
 
         if not path.exists():
             raise FileNotFoundError(f"{path} does not exist")
@@ -20,7 +24,7 @@ class Config:
 
         ssh = SSH.load(config)
 
-        return cls(ssh=ssh)
+        return cls(project_root=project_root, ssh=ssh)
 
 
 @dataclasses.dataclass
