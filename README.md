@@ -1,0 +1,35 @@
+# DTU HPC CLI
+CLI for working with the High Performance Cluster (HPC) at Technical University of Denmark (DTU). This CLI is a wrapper around the tools provided by the HPC to make it easier to run and manage jobs. See the [HPC documentation](https://www.hpc.dtu.dk) for more information.
+
+## Requirements
+
+The CLI assumes that you have access to the following shell commands:
+
+* ssh
+
+## Installation
+
+The CLI can be installed using pip:
+
+``` sh
+pip install dtu-hpc-cli
+```
+
+## Configuration
+
+You will need to configure the CLI for each project, such that it knows what to install and how to connect to the HPC. You do this by creating a `.dtu_hpc.json` in the root of your project. (We suggest that you add this file to .gitignore since the SSH configuration is specific to each user.)
+
+``` json
+{
+    "ssh": ...,
+}
+```
+
+**ssh**: This can either be a string or a dictionary. The string should refer to the name of an entry in your SSH config. The dictionary can specify these keys: *host*, *user*, and *identityfile*. *host* is optional and defaults to *"login1.hpc.dtu.dk"`*. For example:
+
+``` json
+{
+    "user": "your_dtu_username",
+    "identityfile": "/your/local/path/to/private/key"
+}
+```
