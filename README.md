@@ -21,15 +21,11 @@ You will need to configure the CLI for each project, such that it knows what to 
 
 ``` json
 {
-    "ssh": ...,
+    "ssh": {
+        "user": "your_dtu_username",
+        "identityfile": "/your/local/path/to/private/key"
+    }
 }
 ```
 
-**ssh**: This can either be a string or a dictionary. The string should refer to the name of an entry in your SSH config. The dictionary can specify these keys: *host*, *user*, and *identityfile*. *host* is optional and defaults to *"login1.hpc.dtu.dk"`*. For example:
-
-``` json
-{
-    "user": "your_dtu_username",
-    "identityfile": "/your/local/path/to/private/key"
-}
-```
+**ssh**: These keys are available: *host*, *user*, and *identityfile*. *host* is optional and defaults to *"login1.hpc.dtu.dk"`*.

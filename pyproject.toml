@@ -5,9 +5,11 @@ description = ""
 authors = ["Christoffer Koo Øhrstrøm <2357447+ChrisFugl@users.noreply.github.com>"]
 readme = "README.md"
 
+
 [tool.poetry.dependencies]
 python = "^3.10"
 typer = "^0.12.5"
+paramiko = "^3.4.1"
 
 
 [tool.poetry.group.dev.dependencies]

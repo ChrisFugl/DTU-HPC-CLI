@@ -1,11 +1,15 @@
 import typer
 
+from dtu_hpc_cli.config import Config
+from dtu_hpc_cli.list import run_list
+
 cli = typer.Typer()
 
 
 @cli.command()
 def list():
-    print("list")
+    config = Config.load()
+    run_list(config)
 
 
 @cli.command()
