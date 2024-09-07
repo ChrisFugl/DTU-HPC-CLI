@@ -20,7 +20,7 @@ build-backend = "poetry.core.masonry.api"
 
 
 [tool.poetry.scripts]
-dtu-hpc = "dtu_hpc_cli:cli"
+dtu = "dtu_hpc_cli:cli"
 
 
 [tool.ruff]
