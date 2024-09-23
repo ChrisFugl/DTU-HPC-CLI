@@ -117,6 +117,9 @@ class Time:
     def is_zero(self) -> bool:
         return self.days == 0 and self.hours == 0 and self.minutes == 0
 
+    def total_hours(self) -> int:
+        return self.days * 24 + self.hours
+
     def __repr__(self):
         return f"Time(days={self.days}, hours={self.hours}, minutes={self.minutes})"
 
