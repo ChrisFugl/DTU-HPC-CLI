@@ -1,3 +1,7 @@
+# TODO: support running on HPC and SSH into the HPC
+# TODO: capture stderr
+
+import abc
 import time
 
 import paramiko
@@ -5,8 +9,34 @@ import paramiko
 from dtu_hpc_cli.config import Config
 
 
-class Client:
+class Client(abc.ABC):
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+
+    def __del__(self):
+        self.close()
+
+    @abc.abstractmethod
+    def run(self, command: str) -> str:
+        pass
+
+    @abc.abstractmethod
+    def close(self):
+        pass
+
+
+def get_client(config: Config) -> Client:
+    # TODO: handle local and global case
+    return SSHClient(config)
+
+
+class SSHClient(Client):
     def __init__(self, config: Config):
+        super().__init__()
+
         self.config = config
 
         self.client = paramiko.SSHClient()
