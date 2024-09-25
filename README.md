@@ -21,11 +21,14 @@ You will need to configure the CLI for each project, such that it knows what to 
 
 ``` json
 {
+    "remote_path": "path/to/project/on/hpc",
     "ssh": {
         "user": "your_dtu_username",
         "identityfile": "/your/local/path/to/private/key"
     }
 }
 ```
+
+**remote_path** *(optional)*: Path to your project on HPC. Defaults to *~/[name]-[hash]* where *[name]* is the project directory name on your local machine and *[hash]* is generated based on the path to *[name]* on your local machine.
 
 **ssh**: These keys are available: *host*, *user*, and *identityfile*. *host* is optional and defaults to *"login1.hpc.dtu.dk"`*.

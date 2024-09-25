@@ -1,5 +1,6 @@
 import dataclasses
 import json
+from hashlib import sha256
 from pathlib import Path
 
 from dtu_hpc_cli.paths import get_project_root
@@ -10,6 +11,7 @@ DEFAULT_HOSTNAME = "login1.hpc.dtu.dk"
 @dataclasses.dataclass
 class Config:
     project_root: Path
+    remote_path: str
     ssh: "SSH"
 
     @classmethod
@@ -22,9 +24,21 @@ class Config:
 
         config = json.loads(path.read_text())
 
+        if not isinstance(config, dict):
+            raise TypeError(f"Invalid type for config (expected dictionary): {type(config)}")
+
+        remote_path = cls.load_remote_path(config, project_root)
         ssh = SSH.load(config)
 
-        return cls(project_root=project_root, ssh=ssh)
+        return cls(project_root=project_root, remote_path=remote_path, ssh=ssh)
+
+    def load_remote_path(config: dict, project_root: Path) -> str:
+        if "remote_path" in config:
+            return config["remote_path"]
+
+        name = project_root.name
+        hash = sha256(str(project_root).encode()).hexdigest()[:8]
+        return f"~/{name}-{hash}"
 
 
 @dataclasses.dataclass
