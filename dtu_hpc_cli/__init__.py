@@ -19,6 +19,12 @@ cli = typer.Typer(pretty_exceptions_show_locals=False)
 
 
 @cli.command()
+def install():
+    # TODO: run installation instructions on the remote machine
+    print("install")
+
+
+@cli.command()
 def list():
     config = Config.load()
     execute_list(config)
