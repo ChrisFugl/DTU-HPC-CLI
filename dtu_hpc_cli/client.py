@@ -24,7 +24,27 @@ class Client(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def cd(self, path: str):
+        pass
+
+    @abc.abstractmethod
     def close(self):
+        pass
+
+    @abc.abstractmethod
+    def remove(self, path: str):
+        pass
+
+    @abc.abstractmethod
+    def save(self, path: str, contents: str):
+        pass
+
+    @abc.abstractmethod
+    def is_local(self) -> bool:
+        pass
+
+    @abc.abstractmethod
+    def is_remote(self) -> bool:
         pass
 
 
@@ -48,6 +68,7 @@ class SSHClient(Client):
             allow_agent=False,
         )
 
+        self.sftp = None
         self.shell = self.client.invoke_shell()
 
         # Empty the initial messages from the HPC.
@@ -65,8 +86,20 @@ class SSHClient(Client):
         self.close()
 
     def close(self):
+        if self.sftp is not None:
+            self.sftp.close()
+            self.sftp = None
         self.shell.close()
         self.client.close()
+
+    def cd(self, path: str):
+        self.run(f"cd {path}")
+
+    def is_local(self) -> bool:
+        return False
+
+    def is_remote(self) -> bool:
+        return True
 
     def run(self, command: str):
         self.shell.send(f"{command}\n")
@@ -78,6 +111,17 @@ class SSHClient(Client):
         output = output[start:]
 
         return output
+
+    def remove(self, path: str):
+        if self.sftp is None:
+            self.sftp = self.client.open_sftp()
+        self.sftp.remove(path)
+
+    def save(self, path: str, contents: str):
+        if self.sftp is None:
+            self.sftp = self.client.open_sftp()
+        with self.sftp.file(path, "w") as f:
+            f.write(contents)
 
     def read(self, capacity: int = 1024, wait: float = 0.25) -> str:
         output: list[str] = []
