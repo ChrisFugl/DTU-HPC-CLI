@@ -1,14 +1,20 @@
 # TODO: configurable defaults for output and error locations
+# TODO: option to specify job preamble in submit command and in config file (the former overwrites the latter)
 
 import dataclasses
+import re
 from enum import StrEnum
 from textwrap import dedent
+from uuid import uuid4
 
 import typer
 
 from dtu_hpc_cli.client import Client
+from dtu_hpc_cli.client import get_client
 from dtu_hpc_cli.config import Config
 from dtu_hpc_cli.types import Time
+
+JOB_ID_PATTERN = re.compile(r"Job <([\d]+)> is submitted to queue")
 
 
 class Queue(StrEnum):
@@ -75,11 +81,7 @@ class SubmitConfig:
     start_after: str | None
 
 
-def execute_submit(config: Config, submit_config: SubmitConfig):
-    # with Client(config) as client:
-    #     output = client.run("bstat")
-    # print(output)
-
+def execute_submit(cli_config: Config, submit_config: SubmitConfig):
     if submit_config.walltime > submit_config.split_every:
         typer.echo(
             f"NB. This will result in multiple jobs as the split time is '{submit_config.split_every}' "
@@ -94,25 +96,49 @@ def execute_submit(config: Config, submit_config: SubmitConfig):
     typer.echo("Submitting job...")
 
     if submit_config.walltime > submit_config.split_every:
-        submit_multiple(config, submit_config)
+        submit_multiple(cli_config, submit_config)
     else:
-        submit_once(config, submit_config)
+        submit_once(cli_config, submit_config)
 
 
-def submit_once(config: Config, submit_config: SubmitConfig):
-    print("once")
+def submit_once(cli_config: Config, submit_config: SubmitConfig):
+    with get_client(cli_config) as client:
+        job_id = submit(client, cli_config, submit_config)
+    print_submit_message(job_id, submit_config.start_after)
 
 
-def submit_multiple(config: Config, submit_config: SubmitConfig):
-    counter = 1
-    time_left = submit_config.walltime
-    while not time_left.is_zero():
-        job_name = f"{submit_config.name}-{counter}"
-        job_walltime = time_left if time_left < submit_config.split_every else submit_config.split_every
-        job_config = dataclasses.replace(submit_config, name=job_name, walltime=job_walltime)
-        print(counter)
-        counter += 1
-        time_left -= job_walltime
+def submit_multiple(cli_config: Config, submit_config: SubmitConfig):
+    with get_client(cli_config) as client:
+        start_after = submit_config.start_after
+        job_counter = 1
+        time_left = submit_config.walltime
+        while not time_left.is_zero():
+            job_name = f"{submit_config.name}-{job_counter}"
+            job_walltime = time_left if time_left < submit_config.split_every else submit_config.split_every
+            job_config = dataclasses.replace(
+                submit_config, name=job_name, start_after=start_after, walltime=job_walltime
+            )
+            job_id = submit(client, cli_config, job_config)
+            print_submit_message(job_id, start_after)
+            start_after = job_id
+            job_counter += 1
+            time_left -= job_walltime
+
+
+def submit(client: Client, cli_config: Config, submit_config: SubmitConfig) -> str:
+    job_script = create_job_script(submit_config)
+    path = f"/tmp/{uuid4()}.sh"
+    client.save(path, job_script)
+    if client.is_remote():
+        client.cd(cli_config.remote_path)
+    stdout = client.run(f"bsub < {path}")
+    client.remove(path)
+
+    job_ids = JOB_ID_PATTERN.findall(stdout)
+    if len(job_ids) != 1:
+        raise Exception(f"Expected a single job ID from submitted job, but multiple from stdout:\n{stdout}")
+    job_id = job_ids[0]
+    return job_id
 
 
 def create_job_script(config: SubmitConfig) -> str:
@@ -166,3 +192,10 @@ def create_job_script(config: SubmitConfig) -> str:
     script = script.strip()
 
     return script
+
+
+def print_submit_message(job_id: str, dependency: str | None):
+    if dependency is None:
+        typer.echo(f"Submitted job <{job_id}>")
+    else:
+        typer.echo(f"Submitted job <{job_id}> after <{dependency}>")
