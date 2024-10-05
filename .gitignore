@@ -1,3 +1,4 @@
 *.pyc
 .dtu_hpc.json
+.ruff_cache/
 .vscode/
