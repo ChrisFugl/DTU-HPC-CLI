@@ -25,9 +25,7 @@ class Config:
         config = json.loads(path.read_text())
 
         if not isinstance(config, dict):
-            raise TypeError(
-                f"Invalid type for config (expected dictionary): {type(config)}"
-            )
+            raise TypeError(f"Invalid type for config (expected dictionary): {type(config)}")
 
         remote_path = cls.load_remote_path(config, project_root)
         ssh = SSH.load(config)

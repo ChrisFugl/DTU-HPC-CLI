@@ -1,7 +1,9 @@
 import subprocess
 
 import typer
-from rich.progress import Progress, SpinnerColumn, TextColumn
+from rich.progress import Progress
+from rich.progress import SpinnerColumn
+from rich.progress import TextColumn
 
 from dtu_hpc_cli.config import Config
 
@@ -20,9 +22,7 @@ def execute_sync(cli_config: Config):
         destination,
     ]
 
-    with Progress(
-        SpinnerColumn(), TextColumn("[progress.description]{task.description}")
-    ) as progress:
+    with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}")) as progress:
         task = progress.add_task(description="Syncing", total=None)
         progress.start()
         try:
