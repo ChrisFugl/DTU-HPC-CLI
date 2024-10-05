@@ -25,7 +25,9 @@ class Config:
         config = json.loads(path.read_text())
 
         if not isinstance(config, dict):
-            raise TypeError(f"Invalid type for config (expected dictionary): {type(config)}")
+            raise TypeError(
+                f"Invalid type for config (expected dictionary): {type(config)}"
+            )
 
         remote_path = cls.load_remote_path(config, project_root)
         ssh = SSH.load(config)
@@ -43,8 +45,9 @@ class Config:
 
 @dataclasses.dataclass
 class SSH:
-    identifier: str | None = None
-    credentials: "SSHCredentials" = None
+    hostname: str
+    user: str
+    identityfile: str
 
     @classmethod
     def load(cls, config: dict):
@@ -53,26 +56,14 @@ class SSH:
 
         ssh = config["ssh"]
 
-        if isinstance(ssh, str):
-            return cls(identifier=ssh)
-        elif isinstance(ssh, dict):
-            hostname = ssh.get("host", DEFAULT_HOSTNAME)
+        hostname = ssh.get("host", DEFAULT_HOSTNAME)
 
-            if "user" not in ssh:
-                raise KeyError('"user" not found in config')
-            user = ssh["user"]
+        if "user" not in ssh:
+            raise KeyError('"user" not found in config')
+        user = ssh["user"]
 
-            if "identityfile" not in ssh:
-                raise KeyError('"identityfile" not found in config')
-            identityfile = ssh["identityfile"]
+        if "identityfile" not in ssh:
+            raise KeyError('"identityfile" not found in config')
+        identityfile = ssh["identityfile"]
 
-            return cls(credentials=SSHCredentials(hostname, user, identityfile))
-        else:
-            raise TypeError(f"Invalid type for ssh: {type(ssh)}")
-
-
-@dataclasses.dataclass
-class SSHCredentials:
-    hostname: str
-    user: str
-    identityfile: str
+        return cls(hostname=hostname, identityfile=identityfile, user=user)

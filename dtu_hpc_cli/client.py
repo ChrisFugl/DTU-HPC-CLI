@@ -62,9 +62,9 @@ class SSHClient(Client):
         self.client = paramiko.SSHClient()
         self.client.load_system_host_keys()
         self.client.connect(
-            hostname=self.config.ssh.credentials.hostname,
-            username=self.config.ssh.credentials.user,
-            key_filename=self.config.ssh.credentials.identityfile,
+            hostname=self.config.ssh.hostname,
+            username=self.config.ssh.user,
+            key_filename=self.config.ssh.identityfile,
             allow_agent=False,
         )
 
