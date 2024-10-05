@@ -40,15 +40,15 @@ def list(
 
 
 @cli.command()
-def run(commands: List[str]):
-    config = Config.load()
-    execute_run(config, commands)
-
-
-@cli.command()
 def remove(job_ids: List[str]):
     config = Config.load()
     execute_remove(config, job_ids)
+
+
+@cli.command()
+def run(commands: List[str]):
+    config = Config.load()
+    execute_run(config, commands)
 
 
 # TODO: add outfile and error files
