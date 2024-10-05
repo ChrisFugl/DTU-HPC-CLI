@@ -5,13 +5,17 @@ import typer
 from typing_extensions import Annotated
 
 from dtu_hpc_cli.config import Config
+from dtu_hpc_cli.list import ListConfig
+from dtu_hpc_cli.list import ListStats
 from dtu_hpc_cli.list import execute_list
+from dtu_hpc_cli.remove import execute_remove
 from dtu_hpc_cli.run import execute_run
 from dtu_hpc_cli.submit import Feature
 from dtu_hpc_cli.submit import Model
 from dtu_hpc_cli.submit import Queue
 from dtu_hpc_cli.submit import SubmitConfig
 from dtu_hpc_cli.submit import execute_submit
+from dtu_hpc_cli.sync import execute_sync
 from dtu_hpc_cli.types import Memory
 from dtu_hpc_cli.types import Time
 
@@ -25,9 +29,14 @@ def install():
 
 
 @cli.command()
-def list():
-    config = Config.load()
-    execute_list(config)
+def list(
+    node: str | None = None,
+    queue: str | None = None,
+    stats: Annotated[ListStats, typer.Option()] = None,
+):
+    cli_config = Config.load()
+    list_config = ListConfig(node=node, queue=queue, stats=stats)
+    execute_list(cli_config, list_config)
 
 
 @cli.command()
@@ -37,9 +46,9 @@ def run(commands: List[str]):
 
 
 @cli.command()
-def remove():
-    # TODO
-    print("remove")
+def remove(job_ids: List[str]):
+    config = Config.load()
+    execute_remove(config, job_ids)
 
 
 # TODO: add outfile and error files
@@ -88,6 +97,12 @@ def submit(
     )
 
     execute_submit(config, submit_config)
+
+
+@cli.command()
+def sync():
+    cli_config = Config.load()
+    execute_sync(cli_config)
 
 
 if __name__ == "__main__":
