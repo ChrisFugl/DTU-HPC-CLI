@@ -31,3 +31,4 @@ def execute_sync(cli_config: Config):
             typer.echo(f"Sync failed: {e}")
             raise typer.Exit(code=1) from e
         progress.update(task, completed=True)
+    typer.echo("Finished synchronizing")
