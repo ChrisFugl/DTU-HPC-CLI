@@ -5,6 +5,7 @@ import typer
 from typing_extensions import Annotated
 
 from dtu_hpc_cli.config import Config
+from dtu_hpc_cli.install import execute_install
 from dtu_hpc_cli.list import ListConfig
 from dtu_hpc_cli.list import ListStats
 from dtu_hpc_cli.list import execute_list
@@ -23,9 +24,15 @@ cli = typer.Typer(pretty_exceptions_show_locals=False)
 
 
 @cli.command()
+def history():
+    # TODO
+    pass
+
+
+@cli.command()
 def install():
-    # TODO: run installation instructions on the remote machine
-    print("install")
+    cli_config = Config.load()
+    execute_install(cli_config)
 
 
 @cli.command()
@@ -43,6 +50,12 @@ def list(
 def remove(job_ids: List[str]):
     config = Config.load()
     execute_remove(config, job_ids)
+
+
+@cli.command()
+def resubmit():
+    # TODO
+    pass
 
 
 @cli.command()

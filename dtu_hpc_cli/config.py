@@ -1,3 +1,8 @@
+# TODO: make SSH config optional and add method to check (and raise exception) if it is present
+#   - use this method in commands that need SSH
+
+# TODO: make name of config file a constant and search/replace in code
+
 import dataclasses
 import json
 from hashlib import sha256
@@ -10,6 +15,7 @@ DEFAULT_HOSTNAME = "login1.hpc.dtu.dk"
 
 @dataclasses.dataclass
 class Config:
+    install: list[str] | None
     project_root: Path
     remote_path: str
     ssh: "SSH"
@@ -27,10 +33,14 @@ class Config:
         if not isinstance(config, dict):
             raise TypeError(f"Invalid type for config (expected dictionary): {type(config)}")
 
+        install = config.get("install")
+        if install is not None and not isinstance(config["install"], list):
+            raise TypeError(f"Invalid type for install option in config (expected list): {type(config['install'])}")
+
         remote_path = cls.load_remote_path(config, project_root)
         ssh = SSH.load(config)
 
-        return cls(project_root=project_root, remote_path=remote_path, ssh=ssh)
+        return cls(install=install, project_root=project_root, remote_path=remote_path, ssh=ssh)
 
     def load_remote_path(config: dict, project_root: Path) -> str:
         if "remote_path" in config:

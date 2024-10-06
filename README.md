@@ -21,6 +21,9 @@ You will need to configure the CLI for each project, such that it knows what to 
 
 ``` json
 {
+    "install": [
+        "pip install -r requirements.txt"
+    ],
     "remote_path": "path/to/project/on/hpc",
     "ssh": {
         "user": "your_dtu_username",
