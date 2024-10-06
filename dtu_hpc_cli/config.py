@@ -1,5 +1,6 @@
 import dataclasses
 import json
+from enum import StrEnum
 from hashlib import sha256
 from pathlib import Path
 
@@ -7,12 +8,60 @@ import typer
 
 from dtu_hpc_cli.constants import CONFIG_FILENAME
 from dtu_hpc_cli.paths import get_project_root
+from dtu_hpc_cli.types import Time
 
 DEFAULT_HOSTNAME = "login1.hpc.dtu.dk"
 
+DEFAULT_SUBMIT_BRANCH = "main"
+
+
+class Queue(StrEnum):
+    gpuamd = "gpuamd"
+    gpua10 = "gpua10"
+    gpua40 = "gpua40"
+    gpua100 = "gpua100"
+    gpuv100 = "gpuv100"
+    hpc = "hpc"
+
+
+class Feature(StrEnum):
+    avx = "avx"
+    avx2 = "avx2"
+    avx512 = "avx512"
+    gpu16gb = "gpu16gb"
+    gpu32gb = "gpu32gb"
+    gpu40gb = "gpu40gb"
+    gpu80gb = "gpu80gb"
+    sm61 = "sm61"
+    sm70 = "sm70"
+    sm80 = "sm80"
+    sm86 = "sm86"
+    sm90 = "sm90"
+    sxm2 = "sxm2"
+
+
+class Model(StrEnum):
+    EPYC7542 = "EPYC7542"
+    EPYC7543 = "EPYC7543"
+    EPYC7551 = "EPYC7551"
+    EPYC9354 = "EPYC9354"
+    EPYC9554 = "EPYC9554"
+    XeonGold6126 = "XeonGold6126"
+    XeonGold6142 = "XeonGold6142"
+    XeonGold6226R = "XeonGold6226R"
+    XeonGold6230 = "XeonGold6230"
+    XeonGold6242 = "XeonGold6242"
+    XeonGold6326 = "XeonGold6326"
+    XeonGold6342 = "XeonGold6342"
+    XeonE5_2609v4 = "XeonE5_2609v4"
+    XeonE5_2650v4 = "XeonE5_2650v4"
+    XeonE5_2660v3 = "XeonE5_2660v3"
+    XeonPlatinum8462Y = "XeonPlatinum8462Y"
+    XeonSilver4110 = "XeonSilver4110"
+
 
 @dataclasses.dataclass
-class SSH:
+class SSHConfig:
     hostname: str
     user: str
     identityfile: str
@@ -41,11 +90,31 @@ class SSH:
 
 
 @dataclasses.dataclass
-class Config:
+class SubmitConfig:
+    branch: str
+    commands: list[str]
+    cores: int
+    features: list[Feature] | None
+    error: str | None
+    gpus: int | None
+    hosts: int
+    model: Model | None
+    output: str | None
+    queue: Queue
+    memory: int
+    name: str
+    split_every: Time
+    walltime: Time
+    start_after: str | None
+
+
+@dataclasses.dataclass
+class CLIConfig:
     install: list[str] | None
     project_root: Path
     remote_path: str
-    ssh: SSH | None
+    ssh: SSHConfig | None
+    submit: SubmitConfig | None
 
     @classmethod
     def load(cls):

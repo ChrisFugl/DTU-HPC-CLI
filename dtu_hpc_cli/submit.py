@@ -1,9 +1,9 @@
 # TODO: configurable defaults for output and error locations
 # TODO: option to specify job preamble in submit command and in config file (the former overwrites the latter)
+# TODO: log job submission to a history file
 
 import dataclasses
 import re
-from enum import StrEnum
 from textwrap import dedent
 from uuid import uuid4
 
@@ -11,77 +11,13 @@ import typer
 
 from dtu_hpc_cli.client import Client
 from dtu_hpc_cli.client import get_client
-from dtu_hpc_cli.config import Config
-from dtu_hpc_cli.types import Time
+from dtu_hpc_cli.config import CLIConfig
+from dtu_hpc_cli.config import SubmitConfig
 
 JOB_ID_PATTERN = re.compile(r"Job <([\d]+)> is submitted to queue")
 
 
-class Queue(StrEnum):
-    gpuamd = "gpuamd"
-    gpua10 = "gpua10"
-    gpua40 = "gpua40"
-    gpua100 = "gpua100"
-    gpuv100 = "gpuv100"
-    hpc = "hpc"
-
-
-class Feature(StrEnum):
-    avx = "avx"
-    avx2 = "avx2"
-    avx512 = "avx512"
-    gpu16gb = "gpu16gb"
-    gpu32gb = "gpu32gb"
-    gpu40gb = "gpu40gb"
-    gpu80gb = "gpu80gb"
-    sm61 = "sm61"
-    sm70 = "sm70"
-    sm80 = "sm80"
-    sm86 = "sm86"
-    sm90 = "sm90"
-    sxm2 = "sxm2"
-
-
-class Model(StrEnum):
-    EPYC7542 = "EPYC7542"
-    EPYC7543 = "EPYC7543"
-    EPYC7551 = "EPYC7551"
-    EPYC9354 = "EPYC9354"
-    EPYC9554 = "EPYC9554"
-    XeonGold6126 = "XeonGold6126"
-    XeonGold6142 = "XeonGold6142"
-    XeonGold6226R = "XeonGold6226R"
-    XeonGold6230 = "XeonGold6230"
-    XeonGold6242 = "XeonGold6242"
-    XeonGold6326 = "XeonGold6326"
-    XeonGold6342 = "XeonGold6342"
-    XeonE5_2609v4 = "XeonE5_2609v4"
-    XeonE5_2650v4 = "XeonE5_2650v4"
-    XeonE5_2660v3 = "XeonE5_2660v3"
-    XeonPlatinum8462Y = "XeonPlatinum8462Y"
-    XeonSilver4110 = "XeonSilver4110"
-
-
-@dataclasses.dataclass
-class SubmitConfig:
-    branch: str
-    commands: list[str]
-    cores: int
-    features: list[Feature] | None
-    error: str | None
-    gpus: int | None
-    hosts: int
-    model: Model | None
-    output: str | None
-    queue: Queue
-    memory: int
-    name: str
-    split_every: Time
-    walltime: Time
-    start_after: str | None
-
-
-def execute_submit(cli_config: Config, submit_config: SubmitConfig):
+def execute_submit(cli_config: CLIConfig, submit_config: SubmitConfig):
     if submit_config.walltime > submit_config.split_every:
         typer.echo(
             f"NB. This will result in multiple jobs as the split time is '{submit_config.split_every}' "
@@ -101,13 +37,13 @@ def execute_submit(cli_config: Config, submit_config: SubmitConfig):
         submit_once(cli_config, submit_config)
 
 
-def submit_once(cli_config: Config, submit_config: SubmitConfig):
+def submit_once(cli_config: CLIConfig, submit_config: SubmitConfig):
     with get_client(cli_config) as client:
         job_id = submit(client, cli_config, submit_config)
     print_submit_message(job_id, submit_config.start_after)
 
 
-def submit_multiple(cli_config: Config, submit_config: SubmitConfig):
+def submit_multiple(cli_config: CLIConfig, submit_config: SubmitConfig):
     with get_client(cli_config) as client:
         start_after = submit_config.start_after
         job_counter = 1
@@ -125,7 +61,7 @@ def submit_multiple(cli_config: Config, submit_config: SubmitConfig):
             time_left -= job_walltime
 
 
-def submit(client: Client, cli_config: Config, submit_config: SubmitConfig) -> str:
+def submit(client: Client, cli_config: CLIConfig, submit_config: SubmitConfig) -> str:
     job_script = create_job_script(submit_config)
     path = f"/tmp/{uuid4()}.sh"
     client.save(path, job_script)

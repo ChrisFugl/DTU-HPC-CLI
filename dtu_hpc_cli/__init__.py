@@ -4,7 +4,7 @@ from typing import Optional
 import typer
 from typing_extensions import Annotated
 
-from dtu_hpc_cli.config import Config
+from dtu_hpc_cli.config import CLIConfig
 from dtu_hpc_cli.constants import CONFIG_FILENAME
 from dtu_hpc_cli.install import execute_install
 from dtu_hpc_cli.list import ListConfig
@@ -32,7 +32,7 @@ def history():
 
 @cli.command()
 def install():
-    cli_config = Config.load()
+    cli_config = CLIConfig.load()
     execute_install(cli_config)
 
 
@@ -42,14 +42,14 @@ def list(
     queue: str | None = None,
     stats: Annotated[ListStats, typer.Option()] = None,
 ):
-    cli_config = Config.load()
+    cli_config = CLIConfig.load()
     list_config = ListConfig(node=node, queue=queue, stats=stats)
     execute_list(cli_config, list_config)
 
 
 @cli.command()
 def remove(job_ids: List[str]):
-    config = Config.load()
+    config = CLIConfig.load()
     execute_remove(config, job_ids)
 
 
@@ -61,7 +61,7 @@ def resubmit():
 
 @cli.command()
 def run(commands: List[str]):
-    config = Config.load()
+    config = CLIConfig.load()
     execute_run(config, commands)
 
 
@@ -90,7 +90,7 @@ def submit(
     if gpus is not None and gpus < 1:
         raise typer.BadParameter("gpus must be greater than 0")
 
-    config = Config.load()
+    config = CLIConfig.load()
 
     submit_config = SubmitConfig(
         branch=branch,
@@ -115,7 +115,7 @@ def submit(
 
 @cli.command()
 def sync():
-    cli_config = Config.load()
+    cli_config = CLIConfig.load()
     cli_config.check_ssh(msg=f"Sync requires a SSH configuration in '{CONFIG_FILENAME}'.")
     execute_sync(cli_config)
 

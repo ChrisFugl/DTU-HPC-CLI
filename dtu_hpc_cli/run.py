@@ -1,8 +1,8 @@
 from dtu_hpc_cli.client import get_client
-from dtu_hpc_cli.config import Config
+from dtu_hpc_cli.config import CLIConfig
 
 
-def execute_run(config: Config, commands: list[str]):
+def execute_run(config: CLIConfig, commands: list[str]):
     # TODO: run on interactive node/gpu
     # TODO: sync
 

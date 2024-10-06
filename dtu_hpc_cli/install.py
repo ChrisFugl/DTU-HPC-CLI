@@ -4,11 +4,11 @@ from rich.progress import SpinnerColumn
 from rich.progress import TextColumn
 
 from dtu_hpc_cli.client import get_client
-from dtu_hpc_cli.config import Config
+from dtu_hpc_cli.config import CLIConfig
 from dtu_hpc_cli.constants import CONFIG_FILENAME
 
 
-def execute_install(cli_config: Config):
+def execute_install(cli_config: CLIConfig):
     if cli_config.install is not None:
         outputs = []
         with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}")) as progress:

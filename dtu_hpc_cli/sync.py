@@ -5,10 +5,10 @@ from rich.progress import Progress
 from rich.progress import SpinnerColumn
 from rich.progress import TextColumn
 
-from dtu_hpc_cli.config import Config
+from dtu_hpc_cli.config import CLIConfig
 
 
-def execute_sync(cli_config: Config):
+def execute_sync(cli_config: CLIConfig):
     ssh = cli_config.ssh
     source = "./"
     destination = f"{ssh.user}@{ssh.hostname}:{cli_config.remote_path}"
