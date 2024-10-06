@@ -5,6 +5,7 @@ from rich.progress import TextColumn
 
 from dtu_hpc_cli.client import get_client
 from dtu_hpc_cli.config import Config
+from dtu_hpc_cli.constants import CONFIG_FILENAME
 
 
 def execute_install(cli_config: Config):
@@ -22,4 +23,4 @@ def execute_install(cli_config: Config):
         outputs = "\n".join(outputs)
         typer.echo(f"Finished installation. Here are the outputs:\n{outputs}")
     else:
-        typer.echo("There is nothing to install. Please set the install field in .dtu_hpc.json.")
+        typer.echo(f"There is nothing to install. Please set the install field in '{CONFIG_FILENAME}'.")

@@ -1,5 +1,3 @@
-# TODO: make name of config file a constant and search/replace in code
-
 import dataclasses
 import json
 from hashlib import sha256
@@ -7,6 +5,7 @@ from pathlib import Path
 
 import typer
 
+from dtu_hpc_cli.constants import CONFIG_FILENAME
 from dtu_hpc_cli.paths import get_project_root
 
 DEFAULT_HOSTNAME = "login1.hpc.dtu.dk"
@@ -51,7 +50,7 @@ class Config:
     @classmethod
     def load(cls):
         project_root = get_project_root()
-        path = project_root / ".dtu_hpc.json"
+        path = project_root / CONFIG_FILENAME
 
         if not path.exists():
             raise FileNotFoundError(f"{path} does not exist")

@@ -5,6 +5,7 @@ import typer
 from typing_extensions import Annotated
 
 from dtu_hpc_cli.config import Config
+from dtu_hpc_cli.constants import CONFIG_FILENAME
 from dtu_hpc_cli.install import execute_install
 from dtu_hpc_cli.list import ListConfig
 from dtu_hpc_cli.list import ListStats
@@ -115,7 +116,7 @@ def submit(
 @cli.command()
 def sync():
     cli_config = Config.load()
-    cli_config.check_ssh(msg="Sync requires a SSH configuration in '.dtu_hpc.json'.")
+    cli_config.check_ssh(msg=f"Sync requires a SSH configuration in '{CONFIG_FILENAME}'.")
     execute_sync(cli_config)
 
 

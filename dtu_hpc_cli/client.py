@@ -7,6 +7,7 @@ import time
 import paramiko
 
 from dtu_hpc_cli.config import Config
+from dtu_hpc_cli.constants import CONFIG_FILENAME
 
 
 class Client(abc.ABC):
@@ -57,7 +58,7 @@ class SSHClient(Client):
     def __init__(self, config: Config):
         super().__init__()
 
-        config.check_ssh(msg="Please provide a SSH configuration in '.dtu_hpc.json'.")
+        config.check_ssh(msg=f"Please provide a SSH configuration in '{CONFIG_FILENAME}'.")
 
         self.config = config
 
