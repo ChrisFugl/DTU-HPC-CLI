@@ -57,6 +57,8 @@ class SSHClient(Client):
     def __init__(self, config: Config):
         super().__init__()
 
+        config.check_ssh(msg="Please provide a SSH configuration in '.dtu_hpc.json'.")
+
         self.config = config
 
         self.client = paramiko.SSHClient()
@@ -86,11 +88,16 @@ class SSHClient(Client):
         self.close()
 
     def close(self):
-        if self.sftp is not None:
-            self.sftp.close()
-            self.sftp = None
-        self.shell.close()
-        self.client.close()
+        sftp = getattr(self, "sftp", None)
+        if sftp is not None:
+            sftp.close()
+            sftp = None
+        shell = getattr(self, "shell", None)
+        if shell is not None:
+            shell.close()
+        client = getattr(self, "client", None)
+        if client is not None:
+            client.close()
 
     def cd(self, path: str):
         self.run(f"cd {path}")

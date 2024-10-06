@@ -115,6 +115,7 @@ def submit(
 @cli.command()
 def sync():
     cli_config = Config.load()
+    cli_config.check_ssh(msg="Sync requires a SSH configuration in '.dtu_hpc.json'.")
     execute_sync(cli_config)
 
 

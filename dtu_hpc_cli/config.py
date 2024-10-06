@@ -1,6 +1,3 @@
-# TODO: make SSH config optional and add method to check (and raise exception) if it is present
-#   - use this method in commands that need SSH
-
 # TODO: make name of config file a constant and search/replace in code
 
 import dataclasses
@@ -8,9 +5,40 @@ import json
 from hashlib import sha256
 from pathlib import Path
 
+import typer
+
 from dtu_hpc_cli.paths import get_project_root
 
 DEFAULT_HOSTNAME = "login1.hpc.dtu.dk"
+
+
+@dataclasses.dataclass
+class SSH:
+    hostname: str
+    user: str
+    identityfile: str
+
+    @classmethod
+    def load(cls, config: dict):
+        if "ssh" not in config:
+            return None
+
+        ssh = config["ssh"]
+
+        if not isinstance(ssh, dict):
+            raise TypeError(f"Invalid type for ssh option in config (expected dictionary): {type(ssh)}")
+
+        hostname = ssh.get("host", DEFAULT_HOSTNAME)
+
+        if "user" not in ssh:
+            raise KeyError('"user" not found in config')
+        user = ssh["user"]
+
+        if "identityfile" not in ssh:
+            raise KeyError('"identityfile" not found in config')
+        identityfile = ssh["identityfile"]
+
+        return cls(hostname=hostname, identityfile=identityfile, user=user)
 
 
 @dataclasses.dataclass
@@ -18,7 +46,7 @@ class Config:
     install: list[str] | None
     project_root: Path
     remote_path: str
-    ssh: "SSH"
+    ssh: SSH | None
 
     @classmethod
     def load(cls):
@@ -50,28 +78,6 @@ class Config:
         hash = sha256(str(project_root).encode()).hexdigest()[:8]
         return f"~/{name}-{hash}"
 
-
-@dataclasses.dataclass
-class SSH:
-    hostname: str
-    user: str
-    identityfile: str
-
-    @classmethod
-    def load(cls, config: dict):
-        if "ssh" not in config:
-            raise KeyError('"ssh" not found in config')
-
-        ssh = config["ssh"]
-
-        hostname = ssh.get("host", DEFAULT_HOSTNAME)
-
-        if "user" not in ssh:
-            raise KeyError('"user" not found in config')
-        user = ssh["user"]
-
-        if "identityfile" not in ssh:
-            raise KeyError('"identityfile" not found in config')
-        identityfile = ssh["identityfile"]
-
-        return cls(hostname=hostname, identityfile=identityfile, user=user)
+    def check_ssh(self, msg: str = "SSH configuration is required for this command."):
+        if self.ssh is None:
+            raise typer.BadParameter(msg)
