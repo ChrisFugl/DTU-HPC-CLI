@@ -1,10 +1,14 @@
 from typing import List
-from typing import Optional
 
 import typer
 from typing_extensions import Annotated
 
 from dtu_hpc_cli.config import CLIConfig
+from dtu_hpc_cli.config import Feature
+from dtu_hpc_cli.config import Model
+from dtu_hpc_cli.config import Queue
+from dtu_hpc_cli.config import SubmitConfig
+from dtu_hpc_cli.config import cli_config
 from dtu_hpc_cli.constants import CONFIG_FILENAME
 from dtu_hpc_cli.install import execute_install
 from dtu_hpc_cli.list import ListConfig
@@ -12,10 +16,6 @@ from dtu_hpc_cli.list import ListStats
 from dtu_hpc_cli.list import execute_list
 from dtu_hpc_cli.remove import execute_remove
 from dtu_hpc_cli.run import execute_run
-from dtu_hpc_cli.submit import Feature
-from dtu_hpc_cli.submit import Model
-from dtu_hpc_cli.submit import Queue
-from dtu_hpc_cli.submit import SubmitConfig
 from dtu_hpc_cli.submit import execute_submit
 from dtu_hpc_cli.sync import execute_sync
 from dtu_hpc_cli.types import Memory
@@ -68,49 +68,51 @@ def run(commands: List[str]):
 # TODO: add outfile and error files
 
 
+class SubmitDefault:
+    def __init__(self, key: str):
+        self.value = cli_config.submit.get(key)
+
+    def __call__(self):
+        return self.value
+
+    def __str__(self):
+        return str(self.value)
+
+
 @cli.command()
 def submit(
     commands: List[str],
-    branch: str = "main",
-    cores: int = 4,
-    feature: Annotated[Optional[List[Feature]], typer.Option()] = None,
-    gpus: int | None = None,
-    hosts: int = 1,
-    memory: Annotated[Memory, typer.Option(parser=Memory.parse)] = "5gb",
-    model: Model | None = None,
-    name: str = "NONAME",
-    queue: Queue = Queue.hpc,
-    split_every: Annotated[Time, typer.Option(parser=Time.parse)] = "1d",
-    start_after: str | None = None,
-    walltime: Annotated[Time, typer.Option(parser=Time.parse)] = "1d",
+    branch: Annotated[str, typer.Option(default_factory=SubmitDefault("branch"))],
+    cores: Annotated[int, typer.Option(default_factory=SubmitDefault("cores"))],
+    feature: Annotated[List[Feature], typer.Option(default_factory=SubmitDefault("feature"))],
+    gpus: Annotated[int, typer.Option(default_factory=SubmitDefault("gpus"))],
+    hosts: Annotated[int, typer.Option(default_factory=SubmitDefault("hosts"))],
+    memory: Annotated[Memory, typer.Option(parser=Memory.parse, default_factory=SubmitDefault("memory"))],
+    model: Annotated[Model, typer.Option(default_factory=SubmitDefault("model"))],
+    name: Annotated[str, typer.Option(default_factory=SubmitDefault("name"))],
+    queue: Annotated[Queue, typer.Option(default_factory=SubmitDefault("queue"))],
+    split_every: Annotated[Time, typer.Option(parser=Time.parse, default_factory=SubmitDefault("split_every"))],
+    start_after: Annotated[str, typer.Option(default_factory=SubmitDefault("start_after"))],
+    walltime: Annotated[Time, typer.Option(parser=Time.parse, default_factory=SubmitDefault("walltime"))],
 ):
-    if cores < 1:
-        raise typer.BadParameter("cores must be greater than 0")
-
-    if gpus is not None and gpus < 1:
-        raise typer.BadParameter("gpus must be greater than 0")
-
-    config = CLIConfig.load()
-
     submit_config = SubmitConfig(
-        branch=branch,
         commands=commands,
+        branch=branch,
         cores=cores,
-        features=feature,
         error=None,
+        feature=feature,
         gpus=gpus,
         hosts=hosts,
+        memory=memory,
         model=model,
+        name=name,
         output=None,
         queue=queue,
-        memory=memory,
-        name=name,
         split_every=split_every,
-        walltime=walltime,
         start_after=start_after,
+        walltime=walltime,
     )
-
-    execute_submit(config, submit_config)
+    execute_submit(submit_config)
 
 
 @cli.command()

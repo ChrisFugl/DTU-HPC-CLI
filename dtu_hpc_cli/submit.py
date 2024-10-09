@@ -11,13 +11,13 @@ import typer
 
 from dtu_hpc_cli.client import Client
 from dtu_hpc_cli.client import get_client
-from dtu_hpc_cli.config import CLIConfig
 from dtu_hpc_cli.config import SubmitConfig
+from dtu_hpc_cli.config import cli_config
 
 JOB_ID_PATTERN = re.compile(r"Job <([\d]+)> is submitted to queue")
 
 
-def execute_submit(cli_config: CLIConfig, submit_config: SubmitConfig):
+def execute_submit(submit_config: SubmitConfig):
     if submit_config.walltime > submit_config.split_every:
         typer.echo(
             f"NB. This will result in multiple jobs as the split time is '{submit_config.split_every}' "
@@ -32,18 +32,18 @@ def execute_submit(cli_config: CLIConfig, submit_config: SubmitConfig):
     typer.echo("Submitting job...")
 
     if submit_config.walltime > submit_config.split_every:
-        submit_multiple(cli_config, submit_config)
+        submit_multiple(submit_config)
     else:
-        submit_once(cli_config, submit_config)
+        submit_once(submit_config)
 
 
-def submit_once(cli_config: CLIConfig, submit_config: SubmitConfig):
+def submit_once(submit_config: SubmitConfig):
     with get_client(cli_config) as client:
-        job_id = submit(client, cli_config, submit_config)
+        job_id = submit(client, submit_config)
     print_submit_message(job_id, submit_config.start_after)
 
 
-def submit_multiple(cli_config: CLIConfig, submit_config: SubmitConfig):
+def submit_multiple(submit_config: SubmitConfig):
     with get_client(cli_config) as client:
         start_after = submit_config.start_after
         job_counter = 1
@@ -54,14 +54,14 @@ def submit_multiple(cli_config: CLIConfig, submit_config: SubmitConfig):
             job_config = dataclasses.replace(
                 submit_config, name=job_name, start_after=start_after, walltime=job_walltime
             )
-            job_id = submit(client, cli_config, job_config)
+            job_id = submit(client, job_config)
             print_submit_message(job_id, start_after)
             start_after = job_id
             job_counter += 1
             time_left -= job_walltime
 
 
-def submit(client: Client, cli_config: CLIConfig, submit_config: SubmitConfig) -> str:
+def submit(client: Client, submit_config: SubmitConfig) -> str:
     job_script = create_job_script(submit_config)
     path = f"/tmp/{uuid4()}.sh"
     client.save(path, job_script)
@@ -109,7 +109,7 @@ def create_job_script(config: SubmitConfig) -> str:
     if config.model is not None:
         options.append(("R", f'"select[model == X{config.model.value}]"'))
 
-    features = [] if config.features is None else config.features
+    features = [] if config.feature is None else config.feature
     for feature in features:
         options.append(("R", f'"select[{feature.value}]"'))
 

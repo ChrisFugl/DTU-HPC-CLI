@@ -28,6 +28,27 @@ You will need to configure the CLI for each project, such that it knows what to 
     "ssh": {
         "user": "your_dtu_username",
         "identityfile": "/your/local/path/to/private/key"
+    },
+    "submit": {
+        "branch": "main",
+        "commands": [
+            "python my_script.py"
+        ],
+        "cores": 4,
+        "feature": [
+            "gpu32gb"
+        ],
+        "error": "path/to/error_$J.err",
+        "gpus": 1,
+        "hosts": 1,
+        "memory": "5GB",
+        "model": "XeonGold6230",
+        "name": "my_job",
+        "output": "path/to/output_$J.out",
+        "queue": "hpc",
+        "split_every": "1d",
+        "start_after": "12345678",
+        "walltime": "1d"
     }
 }
 ```

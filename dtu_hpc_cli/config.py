@@ -8,6 +8,7 @@ import typer
 
 from dtu_hpc_cli.constants import CONFIG_FILENAME
 from dtu_hpc_cli.paths import get_project_root
+from dtu_hpc_cli.types import Memory
 from dtu_hpc_cli.types import Time
 
 DEFAULT_HOSTNAME = "login1.hpc.dtu.dk"
@@ -74,16 +75,16 @@ class SSHConfig:
         ssh = config["ssh"]
 
         if not isinstance(ssh, dict):
-            raise TypeError(f"Invalid type for ssh option in config (expected dictionary): {type(ssh)}")
+            raise typer.BadParameter(f"Invalid type for ssh option in config (expected dictionary): {type(ssh)}")
 
         hostname = ssh.get("host", DEFAULT_HOSTNAME)
 
         if "user" not in ssh:
-            raise KeyError('"user" not found in config')
+            raise typer.BadParameter('"user" not found in config')
         user = ssh["user"]
 
         if "identityfile" not in ssh:
-            raise KeyError('"identityfile" not found in config')
+            raise typer.BadParameter('"identityfile" not found in config')
         identityfile = ssh["identityfile"]
 
         return cls(hostname=hostname, identityfile=identityfile, user=user)
@@ -94,18 +95,57 @@ class SubmitConfig:
     branch: str
     commands: list[str]
     cores: int
-    features: list[Feature] | None
+    feature: list[Feature] | None
     error: str | None
     gpus: int | None
     hosts: int
+    memory: Memory
     model: Model | None
+    name: str
     output: str | None
     queue: Queue
-    memory: int
-    name: str
     split_every: Time
-    walltime: Time
     start_after: str | None
+    walltime: Time
+
+    @classmethod
+    def defaults(cls):
+        return {
+            "branch": "main",
+            "commands": [],
+            "cores": 4,
+            "feature": None,
+            "error": None,
+            "gpus": None,
+            "hosts": 1,
+            "memory": "5GB",
+            "model": None,
+            "name": "NONAME",
+            "output": None,
+            "queue": "hpc",
+            "split_every": "1d",
+            "start_after": None,
+            "walltime": "1d",
+        }
+
+    @classmethod
+    def load(cls, config: dict):
+        if "submit" not in config:
+            return cls.defaults()
+
+        submit = config["submit"]
+
+        if not isinstance(submit, dict):
+            raise typer.BadParameter(f"Invalid type for submit option in config (expected dictionary): {type(submit)}")
+
+        submit = {key.replace("-", "_"): value for key, value in submit.items()}
+        for key in submit.keys():
+            if key not in cls.__annotations__:
+                raise typer.BadParameter(f"Unknown option in submit config: {key}")
+
+        output = {**cls.defaults(), **submit}
+
+        return output
 
 
 @dataclasses.dataclass
@@ -127,16 +167,20 @@ class CLIConfig:
         config = json.loads(path.read_text())
 
         if not isinstance(config, dict):
-            raise TypeError(f"Invalid type for config (expected dictionary): {type(config)}")
+            raise typer.BadParameter(f"Invalid type for config (expected dictionary): {type(config)}")
 
         install = config.get("install")
         if install is not None and not isinstance(config["install"], list):
-            raise TypeError(f"Invalid type for install option in config (expected list): {type(config['install'])}")
+            raise typer.BadParameter(
+                f"Invalid type for install option in config (expected list): {type(config['install'])}"
+            )
 
         remote_path = cls.load_remote_path(config, project_root)
-        ssh = SSH.load(config)
+        ssh = SSHConfig.load(config)
 
-        return cls(install=install, project_root=project_root, remote_path=remote_path, ssh=ssh)
+        submit = SubmitConfig.load(config)
+
+        return cls(install=install, project_root=project_root, remote_path=remote_path, ssh=ssh, submit=submit)
 
     def load_remote_path(config: dict, project_root: Path) -> str:
         if "remote_path" in config:
@@ -149,3 +193,6 @@ class CLIConfig:
     def check_ssh(self, msg: str = "SSH configuration is required for this command."):
         if self.ssh is None:
             raise typer.BadParameter(msg)
+
+
+cli_config = CLIConfig.load()
