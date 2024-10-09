@@ -59,12 +59,6 @@ def resubmit():
     pass
 
 
-@cli.command()
-def run(commands: List[str]):
-    config = CLIConfig.load()
-    execute_run(config, commands)
-
-
 # TODO: add outfile and error files
 
 
