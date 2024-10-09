@@ -2,7 +2,6 @@ import dataclasses
 import enum
 
 from dtu_hpc_cli.client import get_client
-from dtu_hpc_cli.config import CLIConfig
 
 
 class ListStats(enum.StrEnum):
@@ -17,7 +16,7 @@ class ListConfig:
     stats: ListStats | None
 
 
-def execute_list(cli_config: CLIConfig, list_config: ListConfig):
+def execute_list(list_config: ListConfig):
     command = ["bstat"]
     match list_config.stats:
         case ListStats.cpu:
@@ -33,6 +32,6 @@ def execute_list(cli_config: CLIConfig, list_config: ListConfig):
 
     command = " ".join(command)
 
-    with get_client(cli_config) as client:
+    with get_client() as client:
         output = client.run(command)
     print(output)

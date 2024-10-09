@@ -7,6 +7,7 @@ import time
 import paramiko
 
 from dtu_hpc_cli.config import CLIConfig
+from dtu_hpc_cli.config import cli_config
 from dtu_hpc_cli.constants import CONFIG_FILENAME
 
 
@@ -49,25 +50,23 @@ class Client(abc.ABC):
         pass
 
 
-def get_client(config: CLIConfig) -> Client:
+def get_client() -> Client:
     # TODO: handle local and global case
-    return SSHClient(config)
+    return SSHClient()
 
 
 class SSHClient(Client):
-    def __init__(self, config: CLIConfig):
+    def __init__(self):
         super().__init__()
 
-        config.check_ssh(msg=f"Please provide a SSH configuration in '{CONFIG_FILENAME}'.")
-
-        self.config = config
+        cli_config.check_ssh(msg=f"Please provide a SSH configuration in '{CONFIG_FILENAME}'.")
 
         self.client = paramiko.SSHClient()
         self.client.load_system_host_keys()
         self.client.connect(
-            hostname=self.config.ssh.hostname,
-            username=self.config.ssh.user,
-            key_filename=self.config.ssh.identityfile,
+            hostname=cli_config.ssh.hostname,
+            username=cli_config.ssh.user,
+            key_filename=cli_config.ssh.identityfile,
             allow_agent=False,
         )
 

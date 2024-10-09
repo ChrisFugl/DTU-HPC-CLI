@@ -15,7 +15,6 @@ from dtu_hpc_cli.list import ListConfig
 from dtu_hpc_cli.list import ListStats
 from dtu_hpc_cli.list import execute_list
 from dtu_hpc_cli.remove import execute_remove
-from dtu_hpc_cli.run import execute_run
 from dtu_hpc_cli.submit import execute_submit
 from dtu_hpc_cli.sync import execute_sync
 from dtu_hpc_cli.types import Memory
@@ -32,8 +31,7 @@ def history():
 
 @cli.command()
 def install():
-    cli_config = CLIConfig.load()
-    execute_install(cli_config)
+    execute_install()
 
 
 @cli.command()
@@ -42,15 +40,13 @@ def list(
     queue: str | None = None,
     stats: Annotated[ListStats, typer.Option()] = None,
 ):
-    cli_config = CLIConfig.load()
     list_config = ListConfig(node=node, queue=queue, stats=stats)
-    execute_list(cli_config, list_config)
+    execute_list(list_config)
 
 
 @cli.command()
 def remove(job_ids: List[str]):
-    config = CLIConfig.load()
-    execute_remove(config, job_ids)
+    execute_remove(job_ids)
 
 
 @cli.command()
@@ -111,9 +107,8 @@ def submit(
 
 @cli.command()
 def sync():
-    cli_config = CLIConfig.load()
     cli_config.check_ssh(msg=f"Sync requires a SSH configuration in '{CONFIG_FILENAME}'.")
-    execute_sync(cli_config)
+    execute_sync()
 
 
 if __name__ == "__main__":
