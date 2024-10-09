@@ -1,8 +1,8 @@
-# TODO: configurable defaults for output and error locations
 # TODO: option to specify job preamble in submit command and in config file (the former overwrites the latter)
 # TODO: log job submission to a history file
 
 import dataclasses
+import os
 import re
 from textwrap import dedent
 from uuid import uuid4
@@ -38,13 +38,13 @@ def execute_submit(submit_config: SubmitConfig):
 
 
 def submit_once(submit_config: SubmitConfig):
-    with get_client(cli_config) as client:
+    with get_client() as client:
         job_id = submit(client, submit_config)
     print_submit_message(job_id, submit_config.start_after)
 
 
 def submit_multiple(submit_config: SubmitConfig):
-    with get_client(cli_config) as client:
+    with get_client() as client:
         start_after = submit_config.start_after
         job_counter = 1
         time_left = submit_config.walltime
@@ -94,17 +94,19 @@ def create_job_script(config: SubmitConfig) -> str:
         ("W", f"{config.walltime.total_hours():02d}:{config.walltime.minutes:02d}"),
     ]
 
-    if config.gpus is not None:
+    if config.gpus is not None and config.gpus > 0:
         options.append(("gpu", f"num={config.gpus}:mode=exclusive_process"))
 
     if config.start_after is not None:
         options.append(("w", f"ended({config.start_after})"))
 
     if config.error is not None:
-        options.append(("e", config.error))
+        error_path = os.path.join(config.error, f"{config.name}_%J.err")
+        options.append(("e", error_path))
 
     if config.output is not None:
-        options.append(("o", config.output))
+        output_path = os.path.join(config.output, f"{config.name}_%J.out")
+        options.append(("o", output_path))
 
     if config.model is not None:
         options.append(("R", f'"select[model == X{config.model.value}]"'))

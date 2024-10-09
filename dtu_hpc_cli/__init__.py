@@ -54,9 +54,6 @@ def resubmit():
     pass
 
 
-# TODO: add outfile and error files
-
-
 class SubmitDefault:
     def __init__(self, key: str):
         self.value = cli_config.submit.get(key)
@@ -73,12 +70,14 @@ def submit(
     commands: List[str],
     branch: Annotated[str, typer.Option(default_factory=SubmitDefault("branch"))],
     cores: Annotated[int, typer.Option(default_factory=SubmitDefault("cores"))],
+    error: Annotated[str, typer.Option(default_factory=SubmitDefault("error"))],
     feature: Annotated[List[Feature], typer.Option(default_factory=SubmitDefault("feature"))],
     gpus: Annotated[int, typer.Option(default_factory=SubmitDefault("gpus"))],
     hosts: Annotated[int, typer.Option(default_factory=SubmitDefault("hosts"))],
     memory: Annotated[Memory, typer.Option(parser=Memory.parse, default_factory=SubmitDefault("memory"))],
     model: Annotated[Model, typer.Option(default_factory=SubmitDefault("model"))],
     name: Annotated[str, typer.Option(default_factory=SubmitDefault("name"))],
+    output: Annotated[str, typer.Option(default_factory=SubmitDefault("output"))],
     queue: Annotated[Queue, typer.Option(default_factory=SubmitDefault("queue"))],
     split_every: Annotated[Time, typer.Option(parser=Time.parse, default_factory=SubmitDefault("split_every"))],
     start_after: Annotated[str, typer.Option(default_factory=SubmitDefault("start_after"))],
@@ -88,14 +87,14 @@ def submit(
         commands=commands,
         branch=branch,
         cores=cores,
-        error=None,
+        error=error,
         feature=feature,
         gpus=gpus,
         hosts=hosts,
         memory=memory,
         model=model,
         name=name,
-        output=None,
+        output=output,
         queue=queue,
         split_every=split_every,
         start_after=start_after,

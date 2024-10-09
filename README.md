@@ -38,13 +38,13 @@ You will need to configure the CLI for each project, such that it knows what to 
         "feature": [
             "gpu32gb"
         ],
-        "error": "path/to/error_$J.err",
+        "error": "path/to/error_dir",
         "gpus": 1,
         "hosts": 1,
         "memory": "5GB",
         "model": "XeonGold6230",
         "name": "my_job",
-        "output": "path/to/output_$J.out",
+        "output": "path/to/output_dir_",
         "queue": "hpc",
         "split_every": "1d",
         "start_after": "12345678",
@@ -56,3 +56,5 @@ You will need to configure the CLI for each project, such that it knows what to 
 **remote_path** *(optional)*: Path to your project on HPC. Defaults to *~/[name]-[hash]* where *[name]* is the project directory name on your local machine and *[hash]* is generated based on the path to *[name]* on your local machine.
 
 **ssh**: These keys are available: *host*, *user*, and *identityfile*. *host* is optional and defaults to *"login1.hpc.dtu.dk"`*.
+
+**submit**: `error` and `output` are directory locations on HPC. The file path will be `[directory]/[name]_[jobId].out` for output and `[directory]/[name]_[jobId].err` for error.
