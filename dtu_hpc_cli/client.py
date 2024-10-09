@@ -6,7 +6,6 @@ import time
 
 import paramiko
 
-from dtu_hpc_cli.config import CLIConfig
 from dtu_hpc_cli.config import cli_config
 from dtu_hpc_cli.constants import CONFIG_FILENAME
 

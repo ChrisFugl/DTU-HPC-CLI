@@ -3,7 +3,6 @@ from typing import List
 import typer
 from typing_extensions import Annotated
 
-from dtu_hpc_cli.config import CLIConfig
 from dtu_hpc_cli.config import Feature
 from dtu_hpc_cli.config import Model
 from dtu_hpc_cli.config import Queue
