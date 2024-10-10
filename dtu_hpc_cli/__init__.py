@@ -16,6 +16,8 @@ from dtu_hpc_cli.list import ListConfig
 from dtu_hpc_cli.list import ListStats
 from dtu_hpc_cli.list import execute_list
 from dtu_hpc_cli.remove import execute_remove
+from dtu_hpc_cli.resubmit import ResubmitConfig
+from dtu_hpc_cli.resubmit import execute_resubmit
 from dtu_hpc_cli.submit import execute_submit
 from dtu_hpc_cli.sync import execute_sync
 from dtu_hpc_cli.types import Memory
@@ -87,9 +89,45 @@ def remove(job_ids: List[str]):
 
 
 @cli.command()
-def resubmit():
-    # TODO
-    pass
+def resubmit(
+    job_id: str,
+    branch: str = None,
+    command: List[str] = None,
+    cores: int = None,
+    error: str = None,
+    feature: List[Feature] = None,
+    gpus: int = None,
+    hosts: int = None,
+    memory: Annotated[Memory, typer.Option(parser=Memory.parse)] = None,
+    model: Model = None,
+    name: str = None,
+    output: str = None,
+    preamble: List[str] = None,
+    queue: Queue = None,
+    split_every: Annotated[Time, typer.Option(parser=Time.parse)] = None,
+    start_after: str = None,
+    walltime: Annotated[Time, typer.Option(parser=Time.parse)] = None,
+):
+    config = ResubmitConfig(
+        job_id=job_id,
+        branch=branch,
+        commands=command,
+        cores=cores,
+        error=error,
+        feature=feature,
+        gpus=gpus,
+        hosts=hosts,
+        memory=memory,
+        model=model,
+        name=name,
+        output=output,
+        preamble=preamble,
+        queue=queue,
+        split_every=split_every,
+        start_after=start_after,
+        walltime=walltime,
+    )
+    execute_resubmit(config)
 
 
 class SubmitDefault:
