@@ -7,6 +7,7 @@ from pathlib import Path
 import typer
 
 from dtu_hpc_cli.constants import CONFIG_FILENAME
+from dtu_hpc_cli.constants import HISTORY_FILENAME
 from dtu_hpc_cli.paths import get_project_root
 from dtu_hpc_cli.types import Memory
 from dtu_hpc_cli.types import Time
@@ -149,9 +150,51 @@ class SubmitConfig:
 
         return output
 
+    def to_dict(self):
+        return {
+            "branch": self.branch,
+            "commands": self.commands,
+            "cores": self.cores,
+            "feature": [feature.value for feature in self.feature] if self.feature is not None else None,
+            "error": self.error,
+            "gpus": self.gpus,
+            "hosts": self.hosts,
+            "memory": str(self.memory),
+            "model": self.model.value if self.model is not None else None,
+            "name": self.name,
+            "output": self.output,
+            "queue": self.queue.value,
+            "preamble": self.preamble,
+            "split_every": str(self.split_every),
+            "start_after": self.start_after,
+            "walltime": str(self.walltime),
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        return cls(
+            branch=data["branch"],
+            commands=data["commands"],
+            cores=data["cores"],
+            feature=[Feature(feature) for feature in data["feature"]] if data["feature"] is not None else None,
+            error=data["error"],
+            gpus=data["gpus"],
+            hosts=data["hosts"],
+            memory=Memory.parse(data["memory"]),
+            model=Model(data["model"]) if data["model"] is not None else None,
+            name=data["name"],
+            output=data["output"],
+            queue=Queue(data["queue"]),
+            preamble=data["preamble"],
+            split_every=Time.parse(data["split_every"]),
+            start_after=data["start_after"],
+            walltime=Time.parse(data["walltime"]),
+        )
+
 
 @dataclasses.dataclass
 class CLIConfig:
+    history_path: Path
     install: list[str] | None
     project_root: Path
     remote_path: str
@@ -177,14 +220,35 @@ class CLIConfig:
                 f"Invalid type for install option in config (expected list): {type(config['install'])}"
             )
 
+        history_path = cls.load_history_path(config, project_root)
+
         remote_path = cls.load_remote_path(config, project_root)
         ssh = SSHConfig.load(config)
 
         submit = SubmitConfig.load(config)
 
-        return cls(install=install, project_root=project_root, remote_path=remote_path, ssh=ssh, submit=submit)
+        return cls(
+            history_path=history_path,
+            install=install,
+            project_root=project_root,
+            remote_path=remote_path,
+            ssh=ssh,
+            submit=submit,
+        )
 
-    def load_remote_path(config: dict, project_root: Path) -> str:
+    @classmethod
+    def load_history_path(cls, config: dict, project_root: Path) -> Path:
+        if "history_path" in config:
+            history_path = config["history_path"]
+            if not isinstance(history_path, str):
+                raise typer.BadParameter(
+                    f"Invalid type for history_path option in config (expected string): {type(history_path)}"
+                )
+            return Path(history_path)
+        return project_root / HISTORY_FILENAME
+
+    @classmethod
+    def load_remote_path(cls, config: dict, project_root: Path) -> str:
         if "remote_path" in config:
             return config["remote_path"]
 

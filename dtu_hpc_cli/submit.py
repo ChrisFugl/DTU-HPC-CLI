@@ -11,6 +11,7 @@ from dtu_hpc_cli.client import Client
 from dtu_hpc_cli.client import get_client
 from dtu_hpc_cli.config import SubmitConfig
 from dtu_hpc_cli.config import cli_config
+from dtu_hpc_cli.history import add_to_history
 
 JOB_ID_PATTERN = re.compile(r"Job <([\d]+)> is submitted to queue")
 
@@ -38,10 +39,12 @@ def execute_submit(submit_config: SubmitConfig):
 def submit_once(submit_config: SubmitConfig):
     with get_client() as client:
         job_id = submit(client, submit_config)
+    add_to_history(submit_config, [job_id])
     print_submit_message(job_id, submit_config.start_after)
 
 
 def submit_multiple(submit_config: SubmitConfig):
+    job_ids = []
     with get_client() as client:
         start_after = submit_config.start_after
         job_counter = 1
@@ -53,10 +56,12 @@ def submit_multiple(submit_config: SubmitConfig):
                 submit_config, name=job_name, start_after=start_after, walltime=job_walltime
             )
             job_id = submit(client, job_config)
+            job_ids.append(job_id)
             print_submit_message(job_id, start_after)
             start_after = job_id
             job_counter += 1
             time_left -= job_walltime
+    add_to_history(submit_config, job_ids)
 
 
 def submit(client: Client, submit_config: SubmitConfig) -> str:

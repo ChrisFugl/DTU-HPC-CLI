@@ -21,6 +21,7 @@ You will need to configure the CLI for each project, such that it knows what to 
 
 ``` json
 {
+    "history_path": "path/to/history.json",
     "install": [
         "pip install -r requirements.txt"
     ],
