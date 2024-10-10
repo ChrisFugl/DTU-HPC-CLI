@@ -9,6 +9,8 @@ from dtu_hpc_cli.config import Queue
 from dtu_hpc_cli.config import SubmitConfig
 from dtu_hpc_cli.config import cli_config
 from dtu_hpc_cli.constants import CONFIG_FILENAME
+from dtu_hpc_cli.history import HistoryConfig
+from dtu_hpc_cli.history import execute_history
 from dtu_hpc_cli.install import execute_install
 from dtu_hpc_cli.list import ListConfig
 from dtu_hpc_cli.list import ListStats
@@ -23,9 +25,45 @@ cli = typer.Typer(pretty_exceptions_show_locals=False)
 
 
 @cli.command()
-def history():
-    # TODO
-    pass
+def history(
+    branch: bool = True,
+    commands: bool = True,
+    cores: bool = True,
+    feature: bool = False,
+    error: bool = False,
+    gpus: bool = True,
+    hosts: bool = False,
+    limit: int = 10,
+    memory: bool = True,
+    model: bool = False,
+    name: bool = True,
+    output: bool = False,
+    queue: bool = True,
+    preamble: bool = False,
+    split_every: bool = False,
+    start_after: bool = False,
+    walltime: bool = True,
+):
+    config = HistoryConfig(
+        branch=branch,
+        commands=commands,
+        cores=cores,
+        feature=feature,
+        error=error,
+        gpus=gpus,
+        hosts=hosts,
+        limit=limit,
+        memory=memory,
+        model=model,
+        name=name,
+        output=output,
+        queue=queue,
+        preamble=preamble,
+        split_every=split_every,
+        start_after=start_after,
+        walltime=walltime,
+    )
+    execute_history(config)
 
 
 @cli.command()
