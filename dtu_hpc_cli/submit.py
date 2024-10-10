@@ -74,8 +74,10 @@ def submit(client: Client, submit_config: SubmitConfig) -> str:
     client.remove(path)
 
     job_ids = JOB_ID_PATTERN.findall(stdout)
-    if len(job_ids) != 1:
-        raise Exception(f"Expected a single job ID from submitted job, but multiple from stdout:\n{stdout}")
+    if len(job_ids) == 0:
+        raise Exception(f"Expected a job ID from submitted job, but got none from stdout:\n{stdout}")
+    elif len(job_ids) > 1:
+        raise Exception(f"Expected a single job ID from submitted job, but got multiple from stdout:\n{stdout}")
     job_id = job_ids[0]
     return job_id
 
@@ -118,7 +120,7 @@ def create_job_script(config: SubmitConfig) -> str:
         options.append(("o", output_path))
 
     if config.model is not None:
-        options.append(("R", f'"select[model == X{config.model.value}]"'))
+        options.append(("R", f'"select[model == {config.model.value}]"'))
 
     features = [] if config.feature is None else config.feature
     for feature in features:
