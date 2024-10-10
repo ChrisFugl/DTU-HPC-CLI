@@ -78,8 +78,7 @@ def submit(client: Client, submit_config: SubmitConfig) -> str:
 def create_job_script(config: SubmitConfig) -> str:
     preamble = []
     for command in config.preamble:
-        command = command.strip()
-        command = f"git switch {config.branch} && {command}"
+        command = prepare_command(config, command)
         preamble.append(command)
     if len(preamble) > 0:
         preamble.insert(0, "")
@@ -87,8 +86,7 @@ def create_job_script(config: SubmitConfig) -> str:
 
     commands = []
     for command in config.commands:
-        command = command.strip()
-        command = f"git switch {config.branch} && {command}"
+        command = prepare_command(config, command)
         commands.append(command)
 
     options = [
@@ -144,3 +142,10 @@ def print_submit_message(job_id: str, dependency: str | None):
         typer.echo(f"Submitted job <{job_id}>")
     else:
         typer.echo(f"Submitted job <{job_id}> after <{dependency}>")
+
+
+def prepare_command(config: SubmitConfig, command: str):
+    command = command.strip()
+    if config.branch is not None:
+        command = f"git switch {config.branch} && {command}"
+    return command

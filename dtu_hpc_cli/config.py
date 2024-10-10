@@ -92,7 +92,7 @@ class SSHConfig:
 
 @dataclasses.dataclass
 class SubmitConfig:
-    branch: str
+    branch: str | None
     commands: list[str]
     cores: int
     feature: list[Feature] | None
