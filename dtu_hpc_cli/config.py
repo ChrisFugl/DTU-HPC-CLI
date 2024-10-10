@@ -104,6 +104,7 @@ class SubmitConfig:
     name: str
     output: str | None
     queue: Queue
+    preamble: list[str]
     split_every: Time
     start_after: str | None
     walltime: Time
@@ -123,6 +124,7 @@ class SubmitConfig:
             "name": "NONAME",
             "output": None,
             "queue": "hpc",
+            "preamble": [],
             "split_every": "1d",
             "start_after": None,
             "walltime": "1d",

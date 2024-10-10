@@ -1,10 +1,8 @@
-# TODO: option to specify job preamble in submit command and in config file (the former overwrites the latter)
 # TODO: log job submission to a history file
 
 import dataclasses
 import os
 import re
-from textwrap import dedent
 from uuid import uuid4
 
 import typer
@@ -78,12 +76,20 @@ def submit(client: Client, submit_config: SubmitConfig) -> str:
 
 
 def create_job_script(config: SubmitConfig) -> str:
-    augmented_commands = []
+    preamble = []
+    for command in config.preamble:
+        command = command.strip()
+        command = f"git switch {config.branch} && {command}"
+        preamble.append(command)
+    if len(preamble) > 0:
+        preamble.insert(0, "")
+        preamble.insert(1, "# Preamble")
+
+    commands = []
     for command in config.commands:
-        augmented_command = command.strip()
-        augmented_command = f"git switch {config.branch} && {augmented_command}"
-        augmented_commands.append(augmented_command)
-    augmented_commands = "\n    ".join(augmented_commands)
+        command = command.strip()
+        command = f"git switch {config.branch} && {command}"
+        commands.append(command)
 
     options = [
         ("J", config.name),
@@ -115,19 +121,20 @@ def create_job_script(config: SubmitConfig) -> str:
     for feature in features:
         options.append(("R", f'"select[{feature.value}]"'))
 
-    options = "\n".join(f"    #BSUB -{flag} {value}" for flag, value in options)
+    options = [f"#BSUB -{flag} {value}" for flag, value in options]
 
-    script = dedent(
-        f"""
-    #!/bin/sh
-    ### General options\n{options}
-    # -- end of LSF options --
-    
-    {augmented_commands}
-    """
-    )
+    script = [
+        "#!/bin/sh",
+        "### General options",
+        *options,
+        "# -- end of LSF options --",
+        *preamble,
+        "",
+        "# Commands",
+        *commands,
+    ]
 
-    script = script.strip()
+    script = "\n".join(script)
 
     return script
 
