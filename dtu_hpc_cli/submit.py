@@ -1,5 +1,3 @@
-# TODO: log job submission to a history file
-
 import dataclasses
 import os
 import re
