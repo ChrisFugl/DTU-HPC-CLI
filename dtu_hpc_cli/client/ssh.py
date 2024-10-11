@@ -51,17 +51,10 @@ class SSHClient(Client):
         if client is not None:
             client.close()
 
-    def cd(self, path: str):
-        self.run(f"cd {path}")
-
-    def is_local(self) -> bool:
-        return False
-
-    def is_remote(self) -> bool:
-        return True
-
-    def run(self, command: str):
-        self.shell.send(f"{command}\n")
+    def run(self, command: str, cwd: str | None = None) -> str:
+        if cwd is not None:
+            command = f"cd {cwd} && {command}"
+        self.shell.sendall(f"{command}\n")
 
         output = self.read().strip()
         output = self.remove_prompt(output)

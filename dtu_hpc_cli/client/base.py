@@ -12,11 +12,7 @@ class Client(abc.ABC):
         self.close()
 
     @abc.abstractmethod
-    def run(self, command: str) -> str:
-        pass
-
-    @abc.abstractmethod
-    def cd(self, path: str):
+    def run(self, command: str, cwd: str | None = None) -> str:
         pass
 
     @abc.abstractmethod
@@ -29,12 +25,4 @@ class Client(abc.ABC):
 
     @abc.abstractmethod
     def save(self, path: str, contents: str):
-        pass
-
-    @abc.abstractmethod
-    def is_local(self) -> bool:
-        pass
-
-    @abc.abstractmethod
-    def is_remote(self) -> bool:
         pass

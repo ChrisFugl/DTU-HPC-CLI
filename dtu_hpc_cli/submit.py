@@ -66,9 +66,7 @@ def submit(client: Client, submit_config: SubmitConfig) -> str:
     job_script = create_job_script(submit_config)
     path = f"/tmp/{uuid4()}.sh"
     client.save(path, job_script)
-    if client.is_remote():
-        client.cd(cli_config.remote_path)
-    stdout = client.run(f"bsub < {path}")
+    stdout = client.run(f"bsub < {path}", cwd=cli_config.remote_path)
     client.remove(path)
 
     job_ids = JOB_ID_PATTERN.findall(stdout)
