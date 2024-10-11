@@ -1,4 +1,5 @@
 *.pyc
+dist/
 .dtu_hpc.json
 .dtu_hpc_history.json
 .ruff_cache/
