@@ -34,7 +34,6 @@ class SSHClient(Client):
         sftp = getattr(self, "sftp", None)
         if sftp is not None:
             sftp.close()
-            sftp = None
         shell = getattr(self, "shell", None)
         if shell is not None:
             shell.close()
