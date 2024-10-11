@@ -1,9 +1,11 @@
 [tool.poetry]
 name = "dtu-hpc-cli"
-version = "1.0.0"
+version = "1.0.1"
 description = ""
 authors = ["Christoffer Koo Øhrstrøm <2357447+ChrisFugl@users.noreply.github.com>"]
 readme = "README.md"
+license = "MIT"
+repository = "https://github.com/ChrisFugl/DTU-HPC-CLI"
 
 
 [tool.poetry.dependencies]
