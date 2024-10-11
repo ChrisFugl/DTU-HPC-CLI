@@ -6,6 +6,7 @@ from rich.progress import SpinnerColumn
 from rich.progress import TextColumn
 
 from dtu_hpc_cli.config import cli_config
+from dtu_hpc_cli.error import error_and_exit
 
 
 def execute_sync():
@@ -28,7 +29,6 @@ def execute_sync():
         try:
             subprocess.run(command, check=True, capture_output=True)
         except subprocess.CalledProcessError as e:
-            typer.echo(f"Sync failed: {e}")
-            raise typer.Exit(code=1) from e
+            error_and_exit(f"Sync failed:\n{e.stderr.decode()}")
         progress.update(task, completed=True)
     typer.echo("Finished synchronizing")

@@ -1,13 +1,12 @@
 import dataclasses
 
-import typer
-
 from dtu_hpc_cli.config import Feature
 from dtu_hpc_cli.config import Memory
 from dtu_hpc_cli.config import Model
 from dtu_hpc_cli.config import Queue
 from dtu_hpc_cli.config import SubmitConfig
 from dtu_hpc_cli.config import Time
+from dtu_hpc_cli.error import error_and_exit
 from dtu_hpc_cli.history import load_history
 from dtu_hpc_cli.submit import execute_submit
 
@@ -67,4 +66,4 @@ def find_job(job_id: str) -> SubmitConfig:
     for entry in history:
         if job_id in entry["job_ids"]:
             return SubmitConfig.from_dict(entry["config"])
-    raise typer.BadParameter(f"Job <{job_id}> not found in history.")
+    error_and_exit(f"Job '{job_id}' not found in history.")

@@ -4,11 +4,9 @@ from enum import StrEnum
 from hashlib import sha256
 from pathlib import Path
 
-import typer
-
 from dtu_hpc_cli.constants import CONFIG_FILENAME
 from dtu_hpc_cli.constants import HISTORY_FILENAME
-from dtu_hpc_cli.paths import get_project_root
+from dtu_hpc_cli.error import error_and_exit
 from dtu_hpc_cli.types import Memory
 from dtu_hpc_cli.types import Time
 
@@ -76,16 +74,16 @@ class SSHConfig:
         ssh = config["ssh"]
 
         if not isinstance(ssh, dict):
-            raise typer.BadParameter(f"Invalid type for ssh option in config (expected dictionary): {type(ssh)}")
+            error_and_exit(f"Invalid type for ssh option in config. Expected dictionary but got {type(ssh)}.")
 
         hostname = ssh.get("host", DEFAULT_HOSTNAME)
 
         if "user" not in ssh:
-            raise typer.BadParameter('"user" not found in config')
+            error_and_exit('"user" not found in SSH config.')
         user = ssh["user"]
 
         if "identityfile" not in ssh:
-            raise typer.BadParameter('"identityfile" not found in config')
+            error_and_exit('"identityfile" not found in SSH config')
         identityfile = ssh["identityfile"]
 
         return cls(hostname=hostname, identityfile=identityfile, user=user)
@@ -139,12 +137,12 @@ class SubmitConfig:
         submit = config["submit"]
 
         if not isinstance(submit, dict):
-            raise typer.BadParameter(f"Invalid type for submit option in config (expected dictionary): {type(submit)}")
+            error_and_exit(f"Invalid type for submit option in config. Expected dictionary but got {type(submit)}.")
 
         submit = {key.replace("-", "_"): value for key, value in submit.items()}
         for key in submit.keys():
             if key not in cls.__annotations__:
-                raise typer.BadParameter(f"Unknown option in submit config: {key}")
+                error_and_exit(f"Unknown option in submit config: {key}")
 
         output = {**cls.defaults(), **submit}
 
@@ -203,21 +201,21 @@ class CLIConfig:
 
     @classmethod
     def load(cls):
-        project_root = get_project_root()
+        project_root = cls.get_project_root()
         path = project_root / CONFIG_FILENAME
 
-        if not path.exists():
-            raise FileNotFoundError(f"{path} does not exist")
-
-        config = json.loads(path.read_text())
+        try:
+            config = json.loads(path.read_text())
+        except json.JSONDecodeError as e:
+            error_and_exit(f"Error while parsing config file at '{path}':\n{e}")
 
         if not isinstance(config, dict):
-            raise typer.BadParameter(f"Invalid type for config (expected dictionary): {type(config)}")
+            error_and_exit(f"Invalid type for config. Expected dictionary but got {type(config)}.")
 
         install = config.get("install")
         if install is not None and not isinstance(config["install"], list):
-            raise typer.BadParameter(
-                f"Invalid type for install option in config (expected list): {type(config['install'])}"
+            error_and_exit(
+                f"Invalid type for install option in config. Expected list but got {type(config['install'])}."
             )
 
         history_path = cls.load_history_path(config, project_root)
@@ -237,12 +235,29 @@ class CLIConfig:
         )
 
     @classmethod
+    def get_project_root(cls) -> Path:
+        """Assume that config file exist in the project root and use that to get the project root."""
+        root = Path("/")
+        current_path = Path.cwd()
+        while current_path != root:
+            if (current_path / CONFIG_FILENAME).exists():
+                return current_path
+            current_path = current_path.parent
+
+        if (root / CONFIG_FILENAME).exists():
+            return root
+
+        error_and_exit(
+            f"Could not find project root. Make sure that '{CONFIG_FILENAME}' exists in the root of the project."
+        )
+
+    @classmethod
     def load_history_path(cls, config: dict, project_root: Path) -> Path:
         if "history_path" in config:
             history_path = config["history_path"]
             if not isinstance(history_path, str):
-                raise typer.BadParameter(
-                    f"Invalid type for history_path option in config (expected string): {type(history_path)}"
+                error_and_exit(
+                    f"Invalid type for history_path option in config. Expected string but got {type(history_path)}."
                 )
             return Path(history_path)
         return project_root / HISTORY_FILENAME
@@ -258,7 +273,7 @@ class CLIConfig:
 
     def check_ssh(self, msg: str = "SSH configuration is required for this command."):
         if self.ssh is None:
-            raise typer.BadParameter(msg)
+            error_and_exit(msg)
 
 
 cli_config = CLIConfig.load()

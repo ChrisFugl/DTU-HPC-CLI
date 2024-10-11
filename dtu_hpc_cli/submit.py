@@ -9,6 +9,7 @@ from dtu_hpc_cli.client import Client
 from dtu_hpc_cli.client import get_client
 from dtu_hpc_cli.config import SubmitConfig
 from dtu_hpc_cli.config import cli_config
+from dtu_hpc_cli.error import error_and_exit
 from dtu_hpc_cli.history import add_to_history
 
 JOB_ID_PATTERN = re.compile(r"Job <([\d]+)> is submitted to queue")
@@ -71,7 +72,7 @@ def submit(client: Client, submit_config: SubmitConfig) -> str:
 
     job_ids = JOB_ID_PATTERN.findall(stdout)
     if len(job_ids) != 1:
-        raise ValueError(stdout)
+        error_and_exit(stdout)
     job_id = job_ids[0]
     return job_id
 
