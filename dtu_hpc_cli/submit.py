@@ -70,10 +70,8 @@ def submit(client: Client, submit_config: SubmitConfig) -> str:
     client.remove(path)
 
     job_ids = JOB_ID_PATTERN.findall(stdout)
-    if len(job_ids) == 0:
-        raise Exception(f"Expected a job ID from submitted job, but got none from stdout:\n{stdout}")
-    elif len(job_ids) > 1:
-        raise Exception(f"Expected a single job ID from submitted job, but got multiple from stdout:\n{stdout}")
+    if len(job_ids) != 1:
+        raise ValueError(stdout)
     job_id = job_ids[0]
     return job_id
 
