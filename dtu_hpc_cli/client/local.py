@@ -8,7 +8,7 @@ class LocalClient(Client):
     def close(self):
         pass
 
-    def run(self, command: str, cwd: str | None = None) -> str:
+    def run(self, command: str, cwd: str | None = None, ssh_timeout: float = 0.25) -> str:
         # Ignore the cwd parameter since we assume that the user is running the command from the correct directory.
         output = subprocess.run(
             command,

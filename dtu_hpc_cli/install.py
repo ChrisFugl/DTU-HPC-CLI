@@ -17,7 +17,7 @@ def execute_install():
             with get_client() as client:
                 for command in cli_config.install:
                     progress.update(task, description=command)
-                    output = client.run(command, cwd=cli_config.remote_path)
+                    output = client.run(command, cwd=cli_config.remote_path, ssh_timeout=30.0)
                     outputs.append(f"> {command}\n{output}")
             progress.update(task, completed=True)
         outputs = "\n".join(outputs)

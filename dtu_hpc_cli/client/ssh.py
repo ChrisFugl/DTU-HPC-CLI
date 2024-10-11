@@ -41,12 +41,12 @@ class SSHClient(Client):
         if client is not None:
             client.close()
 
-    def run(self, command: str, cwd: str | None = None) -> str:
+    def run(self, command: str, cwd: str | None = None, ssh_timeout: float = 0.25) -> str:
         if cwd is not None:
             command = f"cd {cwd} && {command}"
         self.shell.sendall(f"{command}\n")
 
-        output = self.read().strip()
+        output = self.read(max_wait=ssh_timeout).strip()
         output = self.remove_prompt(output)
 
         start = len(command) + 2  # +2 for the \r\n
@@ -65,20 +65,33 @@ class SSHClient(Client):
         with self.sftp.file(path, "w") as f:
             f.write(contents)
 
-    def read(self, capacity: int = 1024, wait: float = 0.25) -> str:
+    def read(self, capacity: int = 1024, wait_incr: float = 0.05, max_wait: float = 0.25) -> str:
         output: list[str] = []
-        while True:
-            if not self.shell.recv_ready():
-                # Hack: HPC will print several messages, but they might not occur at the same time.
-                # We wait for a short period to see if more messages are arriving.
-                time.sleep(wait)
-                if not self.shell.recv_ready():
-                    break
+
+        ready = True
+        while ready:
+            output.extend(self.readall_stdout(capacity=capacity))
+            ready = self.wait_for_ready(wait_incr, max_wait)
+
+        output = "".join(output)
+        return output
+
+    def readall_stdout(self, capacity: int = 1024) -> list[str]:
+        output: list[str] = []
+        while self.shell.recv_ready():
             msg = self.shell.recv(capacity)
             msg = msg.decode("utf-8")
             output.append(msg)
-        output = "".join(output)
         return output
+
+    def wait_for_ready(self, wait_incr: float, max_wait: float) -> bool:
+        # Hack: HPC will print several messages, but they might not occur at the same time.
+        # We wait for a short period to see if more messages are arriving.
+        total_wait = 0.0
+        while not self.shell.recv_ready() and total_wait < max_wait:
+            time.sleep(wait_incr)
+            total_wait += wait_incr
+        return self.shell.recv_ready()
 
     def get_num_prompt_lines(self) -> int:
         """Count number of lines used for the user prompt.
