@@ -1,6 +1,3 @@
-# TODO: support running on HPC and SSH into the HPC
-# TODO: capture stderr
-
 import abc
 import time
 
@@ -50,7 +47,6 @@ class Client(abc.ABC):
 
 
 def get_client() -> Client:
-    # TODO: handle local and global case
     return SSHClient()
 
 
