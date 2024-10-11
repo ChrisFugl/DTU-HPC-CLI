@@ -15,6 +15,8 @@ def execute_install():
             task = progress.add_task(description="Installing", total=None)
             progress.start()
             with get_client() as client:
+                if client.is_remote():
+                    client.cd(cli_config.remote_path)
                 for command in cli_config.install:
                     progress.update(task, description=command)
                     output = client.run(command)
