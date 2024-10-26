@@ -13,6 +13,7 @@ from dtu_hpc_cli.install import execute_install
 from dtu_hpc_cli.list import ListConfig
 from dtu_hpc_cli.list import ListStats
 from dtu_hpc_cli.list import execute_list
+from dtu_hpc_cli.remove import RemoveConfig
 from dtu_hpc_cli.remove import execute_remove
 from dtu_hpc_cli.resubmit import ResubmitConfig
 from dtu_hpc_cli.resubmit import execute_resubmit
@@ -164,8 +165,9 @@ def list(
 
 
 @cli.command()
-def remove(job_ids: List[str]):
-    execute_remove(job_ids)
+def remove(job_ids: List[str], from_history: bool = False):
+    config = RemoveConfig(from_history=from_history, job_ids=job_ids)
+    execute_remove(config)
 
 
 @cli.command()
