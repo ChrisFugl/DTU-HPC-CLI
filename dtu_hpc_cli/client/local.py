@@ -1,6 +1,8 @@
 import os
 import subprocess
 
+import typer
+
 from dtu_hpc_cli.client.base import Client
 
 
@@ -8,16 +10,23 @@ class LocalClient(Client):
     def close(self):
         pass
 
-    def run(self, command: str, cwd: str | None = None, ssh_timeout: float = 0.25) -> str:
+    def run(self, command: str, cwd: str | None = None) -> str:
         # Ignore the cwd parameter since we assume that the user is running the command from the correct directory.
-        output = subprocess.run(
+        outputs = []
+        with subprocess.Popen(
             command,
             shell=True,
+            text=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
-            text=True,
-        )
-        return output.stdout
+            bufsize=1,
+            universal_newlines=True,
+        ) as process:
+            for line in process.stdout:
+                typer.echo(line, nl=False)
+                outputs.append(line)
+        output = "".join(outputs)
+        return output
 
     def remove(self, path: str):
         os.remove(path)
