@@ -65,8 +65,11 @@ def submit(client: Client, submit_config: SubmitConfig) -> str:
     job_script = create_job_script(submit_config)
     path = f"/tmp/{uuid4()}.sh"
     client.save(path, job_script)
-    stdout = client.run(f"bsub < {path}", cwd=cli_config.remote_path)
+    returncode, stdout = client.run(f"bsub < {path}", cwd=cli_config.remote_path)
     client.remove(path)
+
+    if returncode != 0:
+        error_and_exit(f"Submission command failed with return code {returncode}.")
 
     job_ids = JOB_ID_PATTERN.findall(stdout)
     if len(job_ids) != 1:

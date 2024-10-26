@@ -12,7 +12,7 @@ class Client(abc.ABC):
         self.close()
 
     @abc.abstractmethod
-    def run(self, command: str, cwd: str | None = None) -> str:
+    def run(self, command: str, cwd: str | None = None) -> tuple[int, str]:
         pass
 
     @abc.abstractmethod

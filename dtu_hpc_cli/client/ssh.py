@@ -20,14 +20,14 @@ class SSHClient(Client):
     def close(self):
         self.client.close()
 
-    def run(self, command: str, cwd: str | None = None) -> str:
+    def run(self, command: str, cwd: str | None = None) -> tuple[int, str]:
         command = f'bash -l -c "{command}"'
         if cwd is not None:
             with self.client.cd(cwd):
-                result = self.client.run(command)
+                result = self.client.run(command, warn=True)
         else:
-            result = self.client.run(command)
-        return result.stdout
+            result = self.client.run(command, warn=True)
+        return result.exited, result.stdout
 
     def remove(self, path: str):
         sftp = self.client.sftp()

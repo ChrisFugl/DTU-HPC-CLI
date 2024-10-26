@@ -10,7 +10,7 @@ class LocalClient(Client):
     def close(self):
         pass
 
-    def run(self, command: str, cwd: str | None = None) -> str:
+    def run(self, command: str, cwd: str | None = None) -> tuple[int, str]:
         # Ignore the cwd parameter since we assume that the user is running the command from the correct directory.
         outputs = []
         with subprocess.Popen(
@@ -25,8 +25,9 @@ class LocalClient(Client):
             for line in process.stdout:
                 typer.echo(line, nl=False)
                 outputs.append(line)
+            returncode = process.wait()
         output = "".join(outputs)
-        return output
+        return returncode, output
 
     def remove(self, path: str):
         os.remove(path)
