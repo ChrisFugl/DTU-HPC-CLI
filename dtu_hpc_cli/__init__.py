@@ -52,7 +52,7 @@ def history(
     hosts_above: int | None = None,
     hosts_below: int | None = None,
     hosts_is: int | None = None,
-    limit: int = 10,
+    limit: int = 5,
     memory: bool = True,
     memory_above: Annotated[Memory, typer.Option(parser=Memory.parse)] = None,
     memory_below: Annotated[Memory, typer.Option(parser=Memory.parse)] = None,
