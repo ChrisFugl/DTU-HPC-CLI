@@ -8,6 +8,7 @@ from rich.table import Table
 
 from dtu_hpc_cli.config import SubmitConfig
 from dtu_hpc_cli.config import cli_config
+from dtu_hpc_cli.error import error_and_exit
 from dtu_hpc_cli.types import Memory
 from dtu_hpc_cli.types import Time
 
@@ -203,6 +204,14 @@ def load_history() -> list[dict]:
 def save_history(history: list[dict]):
     path = cli_config.history_path
     path.write_text(json.dumps(history))
+
+
+def find_job(job_id: str) -> dict:
+    history = load_history()
+    for entry in history:
+        if job_id in entry["job_ids"]:
+            return entry["config"]
+    error_and_exit(f"Job '{job_id}' not found in history.")
 
 
 def filter_by_string(history: list[dict], key: str, contains: str | None, equals: str | None) -> list[dict]:

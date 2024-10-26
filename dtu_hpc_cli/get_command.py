@@ -1,7 +1,6 @@
 import typer
 
-from dtu_hpc_cli.error import error_and_exit
-from dtu_hpc_cli.history import load_history
+from dtu_hpc_cli.history import find_job
 
 
 def execute_get_command(job_id: str):
@@ -17,16 +16,8 @@ def execute_get_command(job_id: str):
         key = key.replace("_", "-")
         command.append(f"--{key} {value}")
 
-    command.extend(f'"{c}"' for c in preamble)
+    command.extend(f'--preamble "{c}"' for c in preamble)
     command.extend(f'"{c}"' for c in submit_commands)
     command = " \\\n    ".join(command)
 
     typer.echo(command)
-
-
-def find_job(job_id: str) -> dict:
-    history = load_history()
-    for entry in history:
-        if job_id in entry["job_ids"]:
-            return entry["config"]
-    error_and_exit(f"Job '{job_id}' not found in history.")

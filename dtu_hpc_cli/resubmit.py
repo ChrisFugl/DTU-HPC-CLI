@@ -6,8 +6,7 @@ from dtu_hpc_cli.config import Model
 from dtu_hpc_cli.config import Queue
 from dtu_hpc_cli.config import SubmitConfig
 from dtu_hpc_cli.config import Time
-from dtu_hpc_cli.error import error_and_exit
-from dtu_hpc_cli.history import load_history
+from dtu_hpc_cli.history import find_job
 from dtu_hpc_cli.submit import execute_submit
 
 
@@ -35,6 +34,7 @@ class ResubmitConfig:
 
 def execute_resubmit(config: ResubmitConfig):
     submit_config = find_job(config.job_id)
+    submit_config = SubmitConfig.from_dict(submit_config)
 
     replacements = {
         "branch": config.branch,
@@ -59,11 +59,3 @@ def execute_resubmit(config: ResubmitConfig):
     submit_config = dataclasses.replace(submit_config, **replacements)
 
     execute_submit(submit_config)
-
-
-def find_job(job_id: str) -> SubmitConfig:
-    history = load_history()
-    for entry in history:
-        if job_id in entry["job_ids"]:
-            return SubmitConfig.from_dict(entry["config"])
-    error_and_exit(f"Job '{job_id}' not found in history.")
