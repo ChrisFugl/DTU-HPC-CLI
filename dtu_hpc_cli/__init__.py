@@ -92,6 +92,7 @@ def history(
     walltime_below: Annotated[Time, typer.Option(parser=Time.parse)] = None,
     walltime_is: Annotated[Time, typer.Option(parser=Time.parse)] = None,
 ):
+    """Show the history of submitted jobs."""
     config = HistoryConfig(
         branch=branch,
         branch_contains=branch_contains,
@@ -154,6 +155,7 @@ def history(
 
 @cli.command()
 def install():
+    """Run the install script in the remote directory on the HPC."""
     execute_install()
 
 
@@ -163,17 +165,20 @@ def list(
     queue: str | None = None,
     stats: Annotated[ListStats, typer.Option()] = None,
 ):
+    """List running and pending jobs."""
     list_config = ListConfig(node=node, queue=queue, stats=stats)
     execute_list(list_config)
 
 
 @cli.command()
 def queues():
+    """List available queues."""
     execute_queues()
 
 
 @cli.command()
 def remove(job_ids: List[str], from_history: bool = False):
+    """Remove jobs from the queue."""
     config = RemoveConfig(from_history=from_history, job_ids=job_ids)
     execute_remove(config)
 
@@ -198,6 +203,7 @@ def resubmit(
     start_after: str = None,
     walltime: Annotated[Time, typer.Option(parser=Time.parse)] = None,
 ):
+    """Resubmit a job. Optionally with new parameters."""
     config = ResubmitConfig(
         job_id=job_id,
         branch=branch,
@@ -241,6 +247,7 @@ def stats(
     node: str | None = None,
     reserved: bool = False,
 ):
+    """Show statistics for the queue(s)."""
     config = StatsConfig(
         cpu=cpu,
         gpu=gpu,
@@ -272,6 +279,7 @@ def submit(
     start_after: Annotated[str, typer.Option(default_factory=SubmitDefault("start_after"))],
     walltime: Annotated[Time, typer.Option(parser=Time.parse, default_factory=SubmitDefault("walltime"))],
 ):
+    """Submit a job to the queue."""
     submit_config = SubmitConfig(
         commands=commands,
         branch=branch,
@@ -295,6 +303,7 @@ def submit(
 
 @cli.command()
 def sync():
+    """Sync the local directory with the remote directory on the HPC."""
     cli_config.check_ssh(msg=f"Sync requires a SSH configuration in '{CONFIG_FILENAME}'.")
     execute_sync()
 
