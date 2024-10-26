@@ -1,29 +1,25 @@
 # DTU HPC CLI
 CLI for working with the High Performance Cluster (HPC) at the Technical University of Denmark (DTU). This CLI is a wrapper around the tools provided by the HPC to make it easier to run and manage jobs. See the [HPC documentation](https://www.hpc.dtu.dk) for more information.
 
-1. [Requirements](#requirements)
-2. [Installation](#installation)
-3. [Usage](#usage)
-4. [Example](#example)
-5. [Configuration](#configuration)
-    
-    a. [SSH](#ssh)
-    
-    b. [Install](#install)
+- [DTU HPC CLI](#dtu-hpc-cli)
+  - [Requirements](#requirements)
+  - [Installation](#installation)
+  - [Usage](#usage)
+  - [Example](#example)
+  - [Configuration](#configuration)
+    - [SSH](#ssh)
+    - [Install](#install)
+    - [History](#history)
+    - [Remote Location](#remote-location)
+    - [Submit](#submit)
+    - [Complete Configuration](#complete-configuration)
 
-    c. [History](#history)
-
-    d. [Remote Location](#remote-location)
-
-    e. [Submit](#submit)
-
-    f. [Complete Configuration](#complete-configuration)
 
 ## Requirements
 
 Python v3.10+ is a requirement.
 
-You will also need to have `rsync` installed for the `dtu sync` command` to work.
+You will also need to have `rsync` installed for the `dtu sync` command to work.
 
 ## Installation
 
