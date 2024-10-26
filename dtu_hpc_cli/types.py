@@ -58,11 +58,35 @@ class Memory:
             case _:
                 raise typer.BadParameter(f"Unit '{unit}' is not supported.\n{cls.expected_format_msg}")
 
+    def to_bytes(self) -> int:
+        match self.unit:
+            case MemoryUnit.B:
+                return self.value
+            case MemoryUnit.KB:
+                return self.value * 1024
+            case MemoryUnit.MB:
+                return self.value * 1024**2
+            case MemoryUnit.GB:
+                return self.value * 1024**3
+            case MemoryUnit.TB:
+                return self.value * 1024**4
+
     def __repr__(self):
         return f"Memory(value={self.value}, unit={self.unit})"
 
     def __str__(self):
         return f"{self.value}{self.unit}"
+
+    def __eq__(self, other: "Memory"):
+        if not isinstance(other, Memory):
+            return False
+        return self.value == other.value and self.unit == other.unit
+
+    def __lt__(self, other: "Memory"):
+        return self.to_bytes() < other.to_bytes()
+
+    def __gt__(self, other: "Memory"):
+        return self.to_bytes() > other.to_bytes()
 
 
 class Time:
