@@ -1,9 +1,6 @@
 import dataclasses
 
-from dtu_hpc_cli.config import Feature
 from dtu_hpc_cli.config import Memory
-from dtu_hpc_cli.config import Model
-from dtu_hpc_cli.config import Queue
 from dtu_hpc_cli.config import SubmitConfig
 from dtu_hpc_cli.config import Time
 from dtu_hpc_cli.history import find_job
@@ -17,15 +14,15 @@ class ResubmitConfig:
     branch: str | None
     commands: list[str] | None
     cores: int | None
-    feature: list[Feature] | None
+    feature: list[str] | None
     error: str | None
     gpus: int | None
     hosts: int | None
     memory: Memory | None
-    model: Model | None
+    model: str | None
     name: str | None
     output: str | None
-    queue: Queue | None
+    queue: str | None
     preamble: list[str]
     split_every: Time | None
     start_after: str | None

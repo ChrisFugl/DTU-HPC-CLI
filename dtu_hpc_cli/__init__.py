@@ -3,9 +3,6 @@ from typing import List
 import typer
 from typing_extensions import Annotated
 
-from dtu_hpc_cli.config import Feature
-from dtu_hpc_cli.config import Model
-from dtu_hpc_cli.config import Queue
 from dtu_hpc_cli.config import SubmitConfig
 from dtu_hpc_cli.config import cli_config
 from dtu_hpc_cli.constants import CONFIG_FILENAME
@@ -178,15 +175,15 @@ def resubmit(
     command: List[str] = None,
     cores: int = None,
     error: str = None,
-    feature: List[Feature] = None,
+    feature: List[str] = None,
     gpus: int = None,
     hosts: int = None,
     memory: Annotated[Memory, typer.Option(parser=Memory.parse)] = None,
-    model: Model = None,
+    model: str = None,
     name: str = None,
     output: str = None,
     preamble: List[str] = None,
-    queue: Queue = None,
+    queue: str = None,
     split_every: Annotated[Time, typer.Option(parser=Time.parse)] = None,
     start_after: str = None,
     walltime: Annotated[Time, typer.Option(parser=Time.parse)] = None,
@@ -230,15 +227,15 @@ def submit(
     branch: Annotated[str, typer.Option(default_factory=SubmitDefault("branch"))],
     cores: Annotated[int, typer.Option(default_factory=SubmitDefault("cores"))],
     error: Annotated[str, typer.Option(default_factory=SubmitDefault("error"))],
-    feature: Annotated[List[Feature], typer.Option(default_factory=SubmitDefault("feature"))],
+    feature: Annotated[List[str], typer.Option(default_factory=SubmitDefault("feature"))],
     gpus: Annotated[int, typer.Option(default_factory=SubmitDefault("gpus"))],
     hosts: Annotated[int, typer.Option(default_factory=SubmitDefault("hosts"))],
     memory: Annotated[Memory, typer.Option(parser=Memory.parse, default_factory=SubmitDefault("memory"))],
-    model: Annotated[Model, typer.Option(default_factory=SubmitDefault("model"))],
+    model: Annotated[str, typer.Option(default_factory=SubmitDefault("model"))],
     name: Annotated[str, typer.Option(default_factory=SubmitDefault("name"))],
     output: Annotated[str, typer.Option(default_factory=SubmitDefault("output"))],
     preamble: Annotated[List[str], typer.Option(default_factory=SubmitDefault("preamble"))],
-    queue: Annotated[Queue, typer.Option(default_factory=SubmitDefault("queue"))],
+    queue: Annotated[str, typer.Option(default_factory=SubmitDefault("queue"))],
     split_every: Annotated[Time, typer.Option(parser=Time.parse, default_factory=SubmitDefault("split_every"))],
     start_after: Annotated[str, typer.Option(default_factory=SubmitDefault("start_after"))],
     walltime: Annotated[Time, typer.Option(parser=Time.parse, default_factory=SubmitDefault("walltime"))],

@@ -1,6 +1,5 @@
 import dataclasses
 import json
-from enum import StrEnum
 from hashlib import sha256
 from pathlib import Path
 
@@ -13,51 +12,6 @@ from dtu_hpc_cli.types import Time
 DEFAULT_HOSTNAME = "login1.hpc.dtu.dk"
 
 DEFAULT_SUBMIT_BRANCH = "main"
-
-
-class Queue(StrEnum):
-    gpuamd = "gpuamd"
-    gpua10 = "gpua10"
-    gpua40 = "gpua40"
-    gpua100 = "gpua100"
-    gpuv100 = "gpuv100"
-    hpc = "hpc"
-
-
-class Feature(StrEnum):
-    avx = "avx"
-    avx2 = "avx2"
-    avx512 = "avx512"
-    gpu16gb = "gpu16gb"
-    gpu32gb = "gpu32gb"
-    gpu40gb = "gpu40gb"
-    gpu80gb = "gpu80gb"
-    sm61 = "sm61"
-    sm70 = "sm70"
-    sm80 = "sm80"
-    sm86 = "sm86"
-    sm90 = "sm90"
-    sxm2 = "sxm2"
-
-
-class Model(StrEnum):
-    EPYC7542 = "EPYC7542"
-    EPYC7543 = "EPYC7543"
-    EPYC7551 = "EPYC7551"
-    EPYC9354 = "EPYC9354"
-    EPYC9554 = "EPYC9554"
-    XeonGold6126 = "XeonGold6126"
-    XeonGold6142 = "XeonGold6142"
-    XeonGold6226R = "XeonGold6226R"
-    XeonGold6230 = "XeonGold6230"
-    XeonGold6242 = "XeonGold6242"
-    XeonGold6326 = "XeonGold6326"
-    XeonGold6342 = "XeonGold6342"
-    XeonE5_2609v4 = "XeonE5_2609v4"
-    XeonE5_2650v4 = "XeonE5_2650v4"
-    XeonE5_2660v3 = "XeonE5_2660v3"
-    XeonPlatinum8462Y = "XeonPlatinum8462Y"
-    XeonSilver4110 = "XeonSilver4110"
 
 
 @dataclasses.dataclass
@@ -94,15 +48,15 @@ class SubmitConfig:
     branch: str | None
     commands: list[str]
     cores: int
-    feature: list[Feature] | None
+    feature: list[str] | None
     error: str | None
     gpus: int | None
     hosts: int
     memory: Memory
-    model: Model | None
+    model: str | None
     name: str
     output: str | None
-    queue: Queue
+    queue: str
     preamble: list[str]
     split_every: Time
     start_after: str | None
@@ -153,15 +107,15 @@ class SubmitConfig:
             "branch": self.branch,
             "commands": self.commands,
             "cores": self.cores,
-            "feature": [feature.value for feature in self.feature] if self.feature is not None else None,
+            "feature": self.feature,
             "error": self.error,
             "gpus": self.gpus,
             "hosts": self.hosts,
             "memory": str(self.memory),
-            "model": self.model.value if self.model is not None else None,
+            "model": self.model,
             "name": self.name,
             "output": self.output,
-            "queue": self.queue.value,
+            "queue": self.queue,
             "preamble": self.preamble,
             "split_every": str(self.split_every),
             "start_after": self.start_after,
@@ -174,15 +128,15 @@ class SubmitConfig:
             branch=data["branch"],
             commands=data["commands"],
             cores=data["cores"],
-            feature=[Feature(feature) for feature in data["feature"]] if data["feature"] is not None else None,
+            feature=data["feature"],
             error=data["error"],
             gpus=data["gpus"],
             hosts=data["hosts"],
             memory=Memory.parse(data["memory"]),
-            model=Model(data["model"]) if data["model"] is not None else None,
+            model=data["model"],
             name=data["name"],
             output=data["output"],
-            queue=Queue(data["queue"]),
+            queue=data["queue"],
             preamble=data["preamble"],
             split_every=Time.parse(data["split_every"]),
             start_after=data["start_after"],

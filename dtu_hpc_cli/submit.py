@@ -91,7 +91,7 @@ def create_job_script(config: SubmitConfig) -> str:
 
     options = [
         ("J", config.name),
-        ("q", config.queue.value),
+        ("q", config.queue),
         ("n", config.cores),
         ("R", f"rusage[mem={config.memory}]"),
         ("R", f"span[hosts={config.hosts}]"),
@@ -113,11 +113,11 @@ def create_job_script(config: SubmitConfig) -> str:
         options.append(("o", output_path))
 
     if config.model is not None:
-        options.append(("R", f'"select[model == {config.model.value}]"'))
+        options.append(("R", f'"select[model == {config.model}]"'))
 
     features = [] if config.feature is None else config.feature
     for feature in features:
-        options.append(("R", f'"select[{feature.value}]"'))
+        options.append(("R", f'"select[{feature}]"'))
 
     options = [f"#BSUB -{flag} {value}" for flag, value in options]
 

@@ -149,7 +149,7 @@ def execute_history(config: HistoryConfig):
         if config.name:
             row.append(values.name)
         if config.queue:
-            row.append(values.queue.value)
+            row.append(values.queue)
         if config.cores:
             row.append(str(values.cores))
         if config.gpus:
@@ -159,10 +159,10 @@ def execute_history(config: HistoryConfig):
         if config.memory:
             row.append(str(values.memory))
         if config.model:
-            row.append(values.model.value if values.model is not None else "-")
+            row.append(values.model if values.model is not None else "-")
         if config.feature:
             row.append(
-                "\n".join(feature.value for feature in values.feature)
+                "\n".join(feature for feature in values.feature)
                 if values.feature is not None and len(values.feature) > 0
                 else "-"
             )
