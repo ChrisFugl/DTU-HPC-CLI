@@ -37,8 +37,7 @@ def execute_history(config: HistoryConfig):
         typer.echo(f"No history found in '{cli_config.history_path}'. You might not have submitted any jobs yet.")
         return
 
-    history.reverse()
-    history = history[: config.limit] if config.limit > 0 else history
+    history = history[-config.limit :] if config.limit > 0 else history
 
     table = Table(title="Job submissions", show_lines=True)
     table.add_column("job ID(s)")
