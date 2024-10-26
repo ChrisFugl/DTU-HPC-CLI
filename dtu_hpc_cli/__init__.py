@@ -9,6 +9,7 @@ from dtu_hpc_cli.config import Queue
 from dtu_hpc_cli.config import SubmitConfig
 from dtu_hpc_cli.config import cli_config
 from dtu_hpc_cli.constants import CONFIG_FILENAME
+from dtu_hpc_cli.get_command import execute_get_command
 from dtu_hpc_cli.history import HistoryConfig
 from dtu_hpc_cli.history import execute_history
 from dtu_hpc_cli.install import execute_install
@@ -24,6 +25,12 @@ from dtu_hpc_cli.types import Memory
 from dtu_hpc_cli.types import Time
 
 cli = typer.Typer(pretty_exceptions_show_locals=False)
+
+
+@cli.command()
+def get_command(job_id: str):
+    """Get the command used to submit a previous job."""
+    execute_get_command(job_id)
 
 
 @cli.command()

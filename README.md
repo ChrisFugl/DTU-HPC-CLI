@@ -35,6 +35,7 @@ You will also need to create a configuration in your project. See [Configuration
 
 You can call it using the `dtu` command, which has the these subcommands:
 
+* **get-command**: Get the command used to submit a previous job.
 * **history**: Shows a list of the jobs that you have submitted and the options/commands that you used.
 * **install**: Calls the installation commands in your configuration. NB. this command will install your project on the HPC - not on your local machine.
 * **list**: Shows a list of running and pending jobs. It calls `bstat` on the HPC.
