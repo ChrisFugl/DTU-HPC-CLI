@@ -13,6 +13,7 @@ from dtu_hpc_cli.install import execute_install
 from dtu_hpc_cli.list import ListConfig
 from dtu_hpc_cli.list import ListStats
 from dtu_hpc_cli.list import execute_list
+from dtu_hpc_cli.queues import execute_queues
 from dtu_hpc_cli.remove import RemoveConfig
 from dtu_hpc_cli.remove import execute_remove
 from dtu_hpc_cli.resubmit import ResubmitConfig
@@ -162,6 +163,11 @@ def list(
 ):
     list_config = ListConfig(node=node, queue=queue, stats=stats)
     execute_list(list_config)
+
+
+@cli.command()
+def queues():
+    execute_queues()
 
 
 @cli.command()

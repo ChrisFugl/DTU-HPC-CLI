@@ -39,6 +39,7 @@ You can call it using the `dtu` command, which has the these subcommands:
 * **history**: Shows a list of the jobs that you have submitted and the options/commands that you used.
 * **install**: Calls the installation commands in your configuration. NB. this command will install your project on the HPC - not on your local machine.
 * **list**: Shows a list of running and pending jobs. It calls `bstat` on the HPC.
+* **queues**: List all queues. It calls `bqueues` on the HPC.
 * **remove**: Removes (kills) one or more running or pending jobs. It calls `bkill` on the HPC.
 * **resubmit**: Submits a job with the same options/commands as a previous job. Each option/command can optionally be overriden.
 * **submit**: Submits a job to the HPC. Calls `bsub` on the HPC. NB. This command will automatically split a job into multiple jobs that run after each other when the walltime exceeds 24 hours. This is done because HPC limits GPU jobs to this duration. You can use the `--split-every` option to change duration at which jobs should be split.
