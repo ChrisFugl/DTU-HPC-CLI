@@ -39,7 +39,6 @@ def submit_once(submit_config: SubmitConfig):
     with get_client() as client:
         job_id = submit(client, submit_config)
     add_to_history(submit_config, [job_id])
-    print_submit_message(job_id, submit_config.start_after)
 
 
 def submit_multiple(submit_config: SubmitConfig):
@@ -56,7 +55,6 @@ def submit_multiple(submit_config: SubmitConfig):
             )
             job_id = submit(client, job_config)
             job_ids.append(job_id)
-            print_submit_message(job_id, start_after)
             start_after = job_id
             job_counter += 1
             time_left -= job_walltime
@@ -137,13 +135,6 @@ def create_job_script(config: SubmitConfig) -> str:
     script = "\n".join(script)
 
     return script
-
-
-def print_submit_message(job_id: str, dependency: str | None):
-    if dependency is None:
-        typer.echo(f"Submitted job <{job_id}>")
-    else:
-        typer.echo(f"Submitted job <{job_id}> after <{dependency}>")
 
 
 def prepare_command(config: SubmitConfig, command: str):

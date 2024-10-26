@@ -33,5 +33,4 @@ def execute_list(list_config: ListConfig):
     command = " ".join(command)
 
     with get_client() as client:
-        output = client.run(command)
-    print(output)
+        client.run(command)
