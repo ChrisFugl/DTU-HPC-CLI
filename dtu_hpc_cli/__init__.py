@@ -18,6 +18,8 @@ from dtu_hpc_cli.remove import RemoveConfig
 from dtu_hpc_cli.remove import execute_remove
 from dtu_hpc_cli.resubmit import ResubmitConfig
 from dtu_hpc_cli.resubmit import execute_resubmit
+from dtu_hpc_cli.start_time import StartTimeConfig
+from dtu_hpc_cli.start_time import execute_start_time
 from dtu_hpc_cli.stats import StatsConfig
 from dtu_hpc_cli.stats import execute_stats
 from dtu_hpc_cli.submit import execute_submit
@@ -226,15 +228,11 @@ def resubmit(
     execute_resubmit(config)
 
 
-class SubmitDefault:
-    def __init__(self, key: str):
-        self.value = cli_config.submit.get(key)
-
-    def __call__(self):
-        return self.value
-
-    def __str__(self):
-        return str(self.value)
+@cli.command()
+def start_time(job_ids: Annotated[List[str], typer.Argument()] = None, queue: str = None, user: str = None):
+    """Show the start time of pending jobs."""
+    config = StartTimeConfig(job_ids=job_ids, queue=queue, user=user)
+    execute_start_time(config)
 
 
 @cli.command()
@@ -258,6 +256,17 @@ def stats(
         queue=queue,
     )
     execute_stats(config)
+
+
+class SubmitDefault:
+    def __init__(self, key: str):
+        self.value = cli_config.submit.get(key)
+
+    def __call__(self):
+        return self.value
+
+    def __str__(self):
+        return str(self.value)
 
 
 @cli.command()
