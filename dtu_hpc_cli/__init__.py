@@ -18,6 +18,8 @@ from dtu_hpc_cli.remove import RemoveConfig
 from dtu_hpc_cli.remove import execute_remove
 from dtu_hpc_cli.resubmit import ResubmitConfig
 from dtu_hpc_cli.resubmit import execute_resubmit
+from dtu_hpc_cli.stats import StatsConfig
+from dtu_hpc_cli.stats import execute_stats
 from dtu_hpc_cli.submit import execute_submit
 from dtu_hpc_cli.sync import execute_sync
 from dtu_hpc_cli.types import Memory
@@ -227,6 +229,28 @@ class SubmitDefault:
 
     def __str__(self):
         return str(self.value)
+
+
+@cli.command()
+def stats(
+    queue: Annotated[str, typer.Argument()] = None,
+    cpu: bool = False,
+    gpu: bool = False,
+    jobs: bool = False,
+    memory: bool = False,
+    node: str | None = None,
+    reserved: bool = False,
+):
+    config = StatsConfig(
+        cpu=cpu,
+        gpu=gpu,
+        jobs=jobs,
+        memory=memory,
+        node=node,
+        reserved=reserved,
+        queue=queue,
+    )
+    execute_stats(config)
 
 
 @cli.command()
