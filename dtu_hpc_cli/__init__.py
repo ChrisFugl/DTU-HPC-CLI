@@ -10,9 +10,9 @@ from dtu_hpc_cli.get_command import execute_get_command
 from dtu_hpc_cli.history import HistoryConfig
 from dtu_hpc_cli.history import execute_history
 from dtu_hpc_cli.install import execute_install
-from dtu_hpc_cli.list import ListConfig
-from dtu_hpc_cli.list import ListStats
-from dtu_hpc_cli.list import execute_list
+from dtu_hpc_cli.jobs import JobsConfig
+from dtu_hpc_cli.jobs import JobsStats
+from dtu_hpc_cli.jobs import execute_jobs
 from dtu_hpc_cli.queues import execute_queues
 from dtu_hpc_cli.remove import RemoveConfig
 from dtu_hpc_cli.remove import execute_remove
@@ -162,14 +162,14 @@ def install():
 
 
 @cli.command()
-def list(
+def jobs(
     node: str | None = None,
     queue: str | None = None,
-    stats: Annotated[ListStats, typer.Option()] = None,
+    stats: Annotated[JobsStats, typer.Option()] = None,
 ):
     """List running and pending jobs."""
-    list_config = ListConfig(node=node, queue=queue, stats=stats)
-    execute_list(list_config)
+    list_config = JobsConfig(node=node, queue=queue, stats=stats)
+    execute_jobs(list_config)
 
 
 @cli.command()
