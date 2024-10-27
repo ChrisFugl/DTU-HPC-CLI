@@ -7,6 +7,10 @@ readme = "README.md"
 license = "MIT"
 repository = "https://github.com/ChrisFugl/DTU-HPC-CLI"
 
+[project.urls]
+Repository = "https://github.com/ChrisFugl/DTU-HPC-CLI"
+Changelog = "https://github.com/ChrisFugl/DTU-HPC-CLI/CHANGELOG.md"
+
 
 [tool.poetry.dependencies]
 python = "^3.10"
