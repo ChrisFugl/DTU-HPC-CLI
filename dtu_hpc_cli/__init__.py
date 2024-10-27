@@ -173,9 +173,9 @@ def jobs(
 
 
 @cli.command()
-def queues():
+def queues(queue: Annotated[str, typer.Argument()] = None):
     """List available queues."""
-    execute_queues()
+    execute_queues(queue)
 
 
 @cli.command()
