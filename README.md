@@ -42,6 +42,7 @@ You can call it using the `dtu` command, which has the these subcommands:
 * **queues**: List all queues or show job statistics for a single queue. It calls `bqueues` or `classtat` on the HPC.
 * **remove**: Removes (kills) one or more running or pending jobs. It calls `bkill` on the HPC.
 * **resubmit**: Submits a job with the same options/commands as a previous job. Each option/command can optionally be overriden.
+* **run**: Run one or more commands on the HPC. Uses the configured remote path as the working directory.
 * **stats**: Shows stats about a queue. It calls `nodestat` on the HPC.
 * **submit**: Submits a job to the HPC. Calls `bsub` on the HPC. NB. This command will automatically split a job into multiple jobs that run after each other when the walltime exceeds 24 hours. This is done because HPC limits GPU jobs to this duration. You can use the `--split-every` option to change duration at which jobs should be split.
 * **sync**: Synchronizes your local project with the project on the HPC. Requires that you have the `rsync` command. NB. It ignores everything in `.gitignore`.

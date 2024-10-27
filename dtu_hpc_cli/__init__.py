@@ -18,6 +18,7 @@ from dtu_hpc_cli.remove import RemoveConfig
 from dtu_hpc_cli.remove import execute_remove
 from dtu_hpc_cli.resubmit import ResubmitConfig
 from dtu_hpc_cli.resubmit import execute_resubmit
+from dtu_hpc_cli.run import execute_run
 from dtu_hpc_cli.start_time import StartTimeConfig
 from dtu_hpc_cli.start_time import execute_start_time
 from dtu_hpc_cli.stats import StatsConfig
@@ -226,6 +227,14 @@ def resubmit(
         walltime=walltime,
     )
     execute_resubmit(config)
+
+
+@cli.command()
+def run(commands: List[str]):
+    """Run one or more commands on the HPC.
+
+    Uses the configured remote path as the working directory."""
+    execute_run(commands)
 
 
 @cli.command()
