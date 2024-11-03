@@ -38,6 +38,6 @@ def expand_job_ids(config: RemoveConfig) -> list[str]:
         typer.echo("The following jobs will be removed (because --from-history flag was used):")
         for job_id in job_ids:
             typer.echo(f" * {job_id}")
-        typer.confirm("\nRemove these jobs?", abort=True, default=True)
+        typer.confirm("\nRemove these jobs (enter to remove)?", abort=True, default=True)
 
     return job_ids

@@ -1,5 +1,10 @@
 # Changelogs
 
+## v1.2.0
+
+Remove:
+* Show default option in prompt when using `--from-history`.
+
 ## v1.1.0
 
 New commands:
