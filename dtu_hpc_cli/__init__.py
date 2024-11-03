@@ -28,7 +28,20 @@ from dtu_hpc_cli.sync import execute_sync
 from dtu_hpc_cli.types import Memory
 from dtu_hpc_cli.types import Time
 
+__version__ = "1.2.0"
+
 cli = typer.Typer(pretty_exceptions_show_locals=False)
+
+
+def version_callback(value: bool):
+    if value:
+        typer.echo(__version__)
+        raise typer.Exit()
+
+
+@cli.callback()
+def main(version: Annotated[bool, typer.Option("--version", callback=version_callback)] = False):
+    pass
 
 
 @cli.command()

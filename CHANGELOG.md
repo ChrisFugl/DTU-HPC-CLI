@@ -2,6 +2,8 @@
 
 ## v1.2.0
 
+Option to show CLI version with `--version`.
+
 Remove:
 * Show default option in prompt when using `--from-history`.
 
