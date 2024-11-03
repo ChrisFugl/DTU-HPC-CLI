@@ -5,6 +5,10 @@
 Remove:
 * Show default option in prompt when using `--from-history`.
 
+Run:
+* Run a single command instead of potentially multiple
+* All arguments are passed on to the remote command. E.g. `dtu run "ls -a"` is now `dtu run ls -a`.
+
 ## v1.1.0
 
 New commands:

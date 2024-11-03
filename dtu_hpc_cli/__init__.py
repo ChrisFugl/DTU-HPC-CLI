@@ -229,12 +229,12 @@ def resubmit(
     execute_resubmit(config)
 
 
-@cli.command()
-def run(commands: List[str]):
-    """Run one or more commands on the HPC.
+@cli.command(context_settings={"allow_extra_args": True, "ignore_unknown_options": True})
+def run(ctx: typer.Context):
+    """Run a command on the HPC.
 
     Uses the configured remote path as the working directory."""
-    execute_run(commands)
+    execute_run(ctx.args)
 
 
 @cli.command()
