@@ -186,7 +186,7 @@ Only override a single option to use the V100 GPU queue as the default queue:
 }
 ```
 
-Provide your own default settings for all *submit* options:
+Provide your own default settings for any of the *submit* options:
 
 ``` json
 {
@@ -206,6 +206,10 @@ Provide your own default settings for all *submit* options:
         "model": "XeonGold6230",
         "name": "my_job",
         "output": "path/to/output_dir_",
+        "preamble": [
+            "module use cuda/12.2",
+            "module use python3/3.11.9"
+        ],
         "queue": "hpc",
         "split_every": "1d",
         "start_after": "12345678",
@@ -247,6 +251,10 @@ Here is a complete example for a configuration that customizes everything:
         "model": "XeonGold6230",
         "name": "my_job",
         "output": "path/to/output_dir_",
+        "preamble": [
+            "module use cuda/12.2",
+            "module use python3/3.11.9"
+        ],
         "queue": "hpc",
         "split_every": "1d",
         "start_after": "12345678",
