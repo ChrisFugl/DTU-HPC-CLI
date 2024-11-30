@@ -26,6 +26,7 @@ class ResubmitConfig:
     preamble: list[str]
     split_every: Time | None
     start_after: str | None
+    sync: bool | None
     walltime: Time | None
 
 
@@ -49,6 +50,7 @@ def execute_resubmit(config: ResubmitConfig):
         "preamble": config.preamble,
         "split_every": config.split_every,
         "start_after": config.start_after,
+        "sync": config.sync,
         "walltime": config.walltime,
     }
     replacements = {key: value for key, value in replacements.items() if value is not None}

@@ -15,6 +15,41 @@ DEFAULT_SUBMIT_BRANCH = "main"
 
 
 @dataclasses.dataclass
+class InstallConfig:
+    commands: list[str]
+    sync: bool
+
+    @classmethod
+    def load(cls, config: dict):
+        if "install" not in config:
+            return None
+
+        install = config["install"]
+
+        if isinstance(install, list):
+            # We support this configuration for backwards compatibility
+            return cls(commands=install, sync=True)
+
+        if not isinstance(install, dict):
+            error_and_exit(f"Invalid type for install option in config. Expected dictionary but got {type(install)}.")
+
+        if "commands" not in install:
+            error_and_exit('"commands" not found in install config.')
+
+        commands = install["commands"]
+        if not isinstance(commands, list):
+            error_and_exit(
+                f"Invalid type for commands option in install config. Expected list but got {type(commands)}."
+            )
+
+        sync = install.get("sync", True)
+        if not isinstance(sync, bool):
+            error_and_exit(f"Invalid type for sync option in install config. Expected boolean but got {type(sync)}.")
+
+        return cls(commands=commands, sync=sync)
+
+
+@dataclasses.dataclass
 class SSHConfig:
     hostname: str
     user: str
@@ -60,6 +95,7 @@ class SubmitConfig:
     preamble: list[str]
     split_every: Time
     start_after: str | None
+    sync: bool
     walltime: Time
 
     @classmethod
@@ -80,6 +116,7 @@ class SubmitConfig:
             "preamble": [],
             "split_every": "1d",
             "start_after": None,
+            "sync": True,
             "walltime": "1d",
         }
 
@@ -119,6 +156,7 @@ class SubmitConfig:
             "preamble": self.preamble,
             "split_every": str(self.split_every),
             "start_after": self.start_after,
+            "sync": self.sync,
             "walltime": str(self.walltime),
         }
 
@@ -140,6 +178,7 @@ class SubmitConfig:
             preamble=data["preamble"],
             split_every=Time.parse(data["split_every"]),
             start_after=data["start_after"],
+            sync=data.get("sync", True),
             walltime=Time.parse(data["walltime"]),
         )
 
@@ -147,7 +186,7 @@ class SubmitConfig:
 @dataclasses.dataclass
 class CLIConfig:
     history_path: Path
-    install: list[str] | None
+    install: InstallConfig | None
     project_root: Path
     remote_path: str
     ssh: SSHConfig | None
@@ -166,11 +205,7 @@ class CLIConfig:
         if not isinstance(config, dict):
             error_and_exit(f"Invalid type for config. Expected dictionary but got {type(config)}.")
 
-        install = config.get("install")
-        if install is not None and not isinstance(config["install"], list):
-            error_and_exit(
-                f"Invalid type for install option in config. Expected list but got {type(config['install'])}."
-            )
+        install = InstallConfig.load(config)
 
         history_path = cls.load_history_path(config, project_root)
 

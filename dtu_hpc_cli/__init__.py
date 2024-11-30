@@ -103,6 +103,7 @@ def history(
     start_after: bool = False,
     start_after_contains: str | None = None,
     start_after_is: str | None = None,
+    sync: bool = False,
     walltime: bool = True,
     walltime_above: Annotated[Time, typer.Option(parser=Time.parse)] = None,
     walltime_below: Annotated[Time, typer.Option(parser=Time.parse)] = None,
@@ -161,6 +162,7 @@ def history(
         start_after=start_after,
         start_after_contains=start_after_contains,
         start_after_is=start_after_is,
+        sync=sync,
         walltime=walltime,
         walltime_above=walltime_above,
         walltime_below=walltime_below,
@@ -217,6 +219,7 @@ def resubmit(
     queue: str = None,
     split_every: Annotated[Time, typer.Option(parser=Time.parse)] = None,
     start_after: str = None,
+    sync: bool = True,
     walltime: Annotated[Time, typer.Option(parser=Time.parse)] = None,
 ):
     """Resubmit a job. Optionally with new parameters."""
@@ -237,6 +240,7 @@ def resubmit(
         queue=queue,
         split_every=split_every,
         start_after=start_after,
+        sync=sync,
         walltime=walltime,
     )
     execute_resubmit(config)
@@ -308,6 +312,7 @@ def submit(
     queue: Annotated[str, typer.Option(default_factory=SubmitDefault("queue"))],
     split_every: Annotated[Time, typer.Option(parser=Time.parse, default_factory=SubmitDefault("split_every"))],
     start_after: Annotated[str, typer.Option(default_factory=SubmitDefault("start_after"))],
+    sync: Annotated[bool, typer.Option(default_factory=SubmitDefault("sync"))],
     walltime: Annotated[Time, typer.Option(parser=Time.parse, default_factory=SubmitDefault("walltime"))],
 ):
     """Submit a job to the queue."""
@@ -327,6 +332,7 @@ def submit(
         queue=queue,
         split_every=split_every,
         start_after=start_after,
+        sync=sync,
         walltime=walltime,
     )
     execute_submit(submit_config)

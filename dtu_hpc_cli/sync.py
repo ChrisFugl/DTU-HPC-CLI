@@ -1,6 +1,5 @@
 import subprocess
 
-import typer
 from rich.progress import Progress
 from rich.progress import SpinnerColumn
 from rich.progress import TextColumn
@@ -32,4 +31,3 @@ def execute_sync():
         except subprocess.CalledProcessError as e:
             error_and_exit(f"Sync failed:\n{e.stderr.decode()}")
         progress.update(task, completed=True)
-    typer.echo("Finished synchronizing")

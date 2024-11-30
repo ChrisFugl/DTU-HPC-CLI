@@ -14,7 +14,13 @@ def execute_get_command(job_id: str):
         if value is None or (isinstance(value, list) and len(value) == 0):
             continue
         key = key.replace("_", "-")
-        command.append(f"--{key} {value}")
+        if isinstance(value, bool):
+            if value:
+                command.append(f"--{key}")
+            else:
+                command.append(f"--no-{key}")
+        else:
+            command.append(f"--{key} {value}")
 
     command.extend(f'--preamble "{c}"' for c in preamble)
     command.extend(f'"{c}"' for c in submit_commands)

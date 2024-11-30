@@ -11,6 +11,7 @@ from dtu_hpc_cli.config import SubmitConfig
 from dtu_hpc_cli.config import cli_config
 from dtu_hpc_cli.error import error_and_exit
 from dtu_hpc_cli.history import add_to_history
+from dtu_hpc_cli.sync import execute_sync
 
 JOB_ID_PATTERN = re.compile(r"Job <([\d]+)> is submitted to queue")
 
@@ -26,6 +27,9 @@ def execute_submit(submit_config: SubmitConfig):
     typer.echo("Job script:")
     typer.echo(f"\n{script}\n")
     typer.confirm("Submit job (enter to submit)?", default=True, abort=True)
+
+    if submit_config.sync:
+        execute_sync()
 
     typer.echo("Submitting job...")
 

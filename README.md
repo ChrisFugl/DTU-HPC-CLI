@@ -141,13 +141,15 @@ The SSH configuration requires that you at least add a *user* and *identityfile*
 
 ### Install
 
-The `install` command requires that you provide a set of commands to run. These are provided using the *install* option.
+The `install` command requires that you provide a set of commands to run. These are provided in *commands* using the *install* option. You may optionally specify *sync* to either *false* or *true*. This determines whether to automatically synchronize your project before running the install commands and default to *true*.
 
 ``` json
 {
-    "install": [
-        "pip install -r requirements.txt"
-    ]
+    "install": {
+        "commands": [
+            "pip install -r requirements.txt"
+        ]
+    }
 }
 ```
 
@@ -213,6 +215,7 @@ Provide your own default settings for any of the *submit* options:
         "queue": "hpc",
         "split_every": "1d",
         "start_after": "12345678",
+        "sync": true,
         "walltime": "1d"
     }
 }
@@ -227,13 +230,17 @@ Here is a complete example for a configuration that customizes everything:
 ``` json
 {
     "history_path": "path/to/history.json",
-    "install": [
-        "pip install -r requirements.txt"
-    ],
+    "install": {
+        "commands": [
+            "pip install -r requirements.txt"
+        ],
+        "sync": true,
+    },
     "remote_path": "path/to/project/on/hpc",
     "ssh": {
         "user": "your_dtu_username",
-        "identityfile": "/your/local/path/to/private/key"
+        "identityfile": "/your/local/path/to/private/key",
+        "hostname": "login1.hpc.dtu.dk"
     },
     "submit": {
         "branch": "main",
@@ -258,6 +265,7 @@ Here is a complete example for a configuration that customizes everything:
         "queue": "hpc",
         "split_every": "1d",
         "start_after": "12345678",
+        "sync": true,
         "walltime": "1d"
     }
 }

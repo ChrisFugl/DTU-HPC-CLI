@@ -6,15 +6,19 @@ from rich.progress import TextColumn
 from dtu_hpc_cli.client import get_client
 from dtu_hpc_cli.config import cli_config
 from dtu_hpc_cli.constants import CONFIG_FILENAME
+from dtu_hpc_cli.sync import execute_sync
 
 
 def execute_install():
-    if cli_config.install is not None:
+    install = cli_config.install
+    if install is not None:
+        if install.sync:
+            execute_sync()
         with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}")) as progress:
             task = progress.add_task(description="Installing", total=None)
             progress.start()
             with get_client() as client:
-                for command in cli_config.install:
+                for command in install.commands:
                     progress.update(task, description=command)
                     client.run(command, cwd=cli_config.remote_path)
             progress.update(task, completed=True)
