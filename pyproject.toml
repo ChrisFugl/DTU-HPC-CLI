@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "dtu-hpc-cli"
 version = "1.2.0"
-description = ""
+description = "CLI to make it easier to work with the HPC cluster at the Technical University of Denmark (DTU)."
 authors = ["Christoffer Koo Øhrstrøm <2357447+ChrisFugl@users.noreply.github.com>"]
 readme = "README.md"
 license = "MIT"
