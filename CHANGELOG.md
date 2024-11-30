@@ -11,6 +11,9 @@ Run:
 * Run a single command instead of potentially multiple.
 * All arguments are passed on to the remote command. E.g. `dtu run "ls -a"` is now `dtu run ls -a`.
 
+Submit:
+* Branch defaults to the currently active branch.
+
 Sync:
 * Delete files remotely if they have been removed locally.
 * Automatically sync when running install, submit, and resubmit (option to opt-out in config).

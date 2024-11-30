@@ -3,11 +3,15 @@ import json
 from hashlib import sha256
 from pathlib import Path
 
+from git import Repo
+
 from dtu_hpc_cli.constants import CONFIG_FILENAME
 from dtu_hpc_cli.constants import HISTORY_FILENAME
 from dtu_hpc_cli.error import error_and_exit
 from dtu_hpc_cli.types import Memory
 from dtu_hpc_cli.types import Time
+
+ACTIVE_BRANCH_KEY = "[[active_branch]]"
 
 DEFAULT_HOSTNAME = "login1.hpc.dtu.dk"
 
@@ -101,7 +105,7 @@ class SubmitConfig:
     @classmethod
     def defaults(cls):
         return {
-            "branch": "main",
+            "branch": ACTIVE_BRANCH_KEY,
             "commands": [],
             "cores": 4,
             "feature": None,
@@ -121,7 +125,7 @@ class SubmitConfig:
         }
 
     @classmethod
-    def load(cls, config: dict):
+    def load(cls, config: dict, project_root: Path):
         if "submit" not in config:
             return cls.defaults()
 
@@ -136,6 +140,10 @@ class SubmitConfig:
                 error_and_exit(f"Unknown option in submit config: {key}")
 
         output = {**cls.defaults(), **submit}
+
+        if output["branch"] == ACTIVE_BRANCH_KEY:
+            repo = Repo(project_root)
+            output["branch"] = repo.active_branch.name
 
         return output
 
@@ -195,6 +203,11 @@ class CLIConfig:
     @classmethod
     def load(cls):
         project_root = cls.get_project_root()
+
+        git_path = project_root / ".git"
+        if not git_path.exists():
+            error_and_exit(f"Could not find git repository at '{git_path}'.")
+
         path = project_root / CONFIG_FILENAME
 
         try:
@@ -212,7 +225,7 @@ class CLIConfig:
         remote_path = cls.load_remote_path(config, project_root)
         ssh = SSHConfig.load(config)
 
-        submit = SubmitConfig.load(config)
+        submit = SubmitConfig.load(config, project_root)
 
         return cls(
             history_path=history_path,

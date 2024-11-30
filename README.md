@@ -17,9 +17,13 @@ CLI for working with the High Performance Cluster (HPC) at the Technical Univers
 
 ## Requirements
 
-Python v3.10+ is a requirement.
+* Python v3.10+
+* git v1.7.0+
+* rsync
 
-You will also need to have `rsync` installed for the `dtu sync` command to work.
+git is required because we assume that you use git for branching. The CLI can use this to get your active branch, so your submitted jobs will run from that branch.
+
+rsync is needed for synchronizing your local code to the HPC.
 
 ## Installation
 
@@ -176,7 +180,7 @@ The tool needs to know the location of your project on the HPC. The location def
 ### Submit
 The submit command has many options and you may want to provide sensible defaults for your specific application. Call `dtu submit --help` to see the existing defaults.
 
-Any of the options can be given a custom default. As such, both of these are valid configurations for *submit*.
+Any of the options can be given a custom default. As such, both of the options below are valid configurations for *submit*.
 
 Only override a single option to use the V100 GPU queue as the default queue:
 
@@ -222,6 +226,8 @@ Provide your own default settings for any of the *submit* options:
 ```
 
 **NB.** *error* and *output* are directory locations on the HPC. The file path will be `[directory]/[name]_[jobId].out` for output and `[directory]/[name]_[jobId].err` for error.
+
+**NB.** *branch* defaults to the special value `[[active_branch]]`. This means that it will use the currently active branch.
 
 ### Complete Configuration
 
