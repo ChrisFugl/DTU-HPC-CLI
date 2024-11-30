@@ -19,6 +19,7 @@ def execute_sync():
         "-e",
         f"ssh -i {ssh.identityfile}",
         "--exclude-from=.gitignore",
+        "--delete",
         source,
         destination,
     ]
