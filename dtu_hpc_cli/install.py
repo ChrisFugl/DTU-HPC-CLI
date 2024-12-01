@@ -11,11 +11,12 @@ from dtu_hpc_cli.sync import execute_sync
 
 
 def execute_install():
-    branch = Repo(cli_config.project_root).active_branch.name
     install = cli_config.install
     if install is not None:
         if install.sync:
             execute_sync()
+        with Repo(cli_config.project_root) as repo:
+            branch = repo.active_branch.name
         with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}")) as progress:
             task = progress.add_task(description="Installing", total=None)
             progress.start()

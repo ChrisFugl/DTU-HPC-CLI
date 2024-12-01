@@ -142,8 +142,8 @@ class SubmitConfig:
         output = {**cls.defaults(), **submit}
 
         if output["branch"] == ACTIVE_BRANCH_KEY:
-            repo = Repo(project_root)
-            output["branch"] = repo.active_branch.name
+            with Repo(project_root) as repo:
+                output["branch"] = repo.active_branch.name
 
         return output
 

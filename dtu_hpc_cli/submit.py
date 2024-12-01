@@ -17,6 +17,9 @@ JOB_ID_PATTERN = re.compile(r"Job <([\d]+)> is submitted to queue")
 
 
 def execute_submit(submit_config: SubmitConfig):
+    if submit_config.sync:
+        execute_sync()
+
     if submit_config.walltime > submit_config.split_every:
         typer.echo(
             f"NB. This will result in multiple jobs as the split time is '{submit_config.split_every}' "
@@ -27,9 +30,6 @@ def execute_submit(submit_config: SubmitConfig):
     typer.echo("Job script:")
     typer.echo(f"\n{script}\n")
     typer.confirm("Submit job (enter to submit)?", default=True, abort=True)
-
-    if submit_config.sync:
-        execute_sync()
 
     typer.echo("Submitting job...")
 
