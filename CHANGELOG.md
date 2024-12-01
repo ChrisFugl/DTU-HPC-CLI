@@ -4,6 +4,9 @@
 
 Option to show CLI version with `--version`.
 
+Install:
+* Run install commands on the active branch.
+
 Remove:
 * Show default option in prompt when using `--from-history`.
 
@@ -12,7 +15,7 @@ Run:
 * All arguments are passed on to the remote command. E.g. `dtu run "ls -a"` is now `dtu run ls -a`.
 
 Submit:
-* Branch defaults to the currently active branch.
+* Branch defaults to the active branch.
 
 Sync:
 * Delete files remotely if they have been removed locally.

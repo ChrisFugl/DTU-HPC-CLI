@@ -1,4 +1,5 @@
 import typer
+from git import Repo
 from rich.progress import Progress
 from rich.progress import SpinnerColumn
 from rich.progress import TextColumn
@@ -10,6 +11,7 @@ from dtu_hpc_cli.sync import execute_sync
 
 
 def execute_install():
+    branch = Repo(cli_config.project_root).active_branch.name
     install = cli_config.install
     if install is not None:
         if install.sync:
@@ -19,6 +21,7 @@ def execute_install():
             progress.start()
             with get_client() as client:
                 for command in install.commands:
+                    command = f"git switch {branch} && {command}"
                     progress.update(task, description=command)
                     client.run(command, cwd=cli_config.remote_path)
             progress.update(task, completed=True)
