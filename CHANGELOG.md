@@ -20,6 +20,7 @@ Submit:
 Sync:
 * Delete files remotely if they have been removed locally.
 * Automatically sync when running install, submit, and resubmit (option to opt-out in config).
+* Warn about uncommitted changes before synchronizing.
 
 ## v1.1.0
 
