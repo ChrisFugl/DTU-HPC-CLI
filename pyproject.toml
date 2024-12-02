@@ -85,11 +85,7 @@ unfixable = []
 
 [tool.ruff.lint.isort]
 force-single-line = true
-known-first-party = ["evit_rust"]
-known-third-party = [
-    "prophesee_toolbox",
-    "wandb"
-]
+known-third-party = []
 
 
 [tool.ruff.lint.flake8-implicit-str-concat]
